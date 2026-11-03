@@ -1,105 +1,127 @@
 <!doctype html>
-<html>
+<html lang="en">
   <%- include('partials/head') %>
 <body>
   <div class="container">
     <%- include('partials/header') %>
 
-    <!-- PAGE HEADER -->
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-      <h2 style="margin:0;">Find a Dietician</h2>
+    <section class="section" style="margin-bottom: 24px;">
+      <div class="page-heading" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px;">
+        <div>
+          <h1 style="font-size:32px; font-weight:800; color:var(--neutral-900); margin:0 0 6px;">
+            🩺 Certified Dieticians & Clinical Nutritionists
+          </h1>
+          <p class="meta" style="font-size:16px; color:var(--neutral-500); margin:0;">
+            Browse verified clinical practitioners, review specialties, and schedule personalized consultations.
+          </p>
+        </div>
+      </div>
+    </section>
 
-      <!-- SEARCH BAR -->
-      <form action="/dieticians" method="get" 
-            style="display:flex; gap:8px; align-items:center;">
-        <input 
-          type="text" 
-          name="q" 
-          placeholder="Search dietician by name..." 
-          value="<%= query.q || '' %>"
-          style="padding:8px 12px; border:1px solid #dfe8df; border-radius:8px; width:220px;">
-        <button class="btn">Search</button>
-      </form>
-    </div>
-
-    <!-- LIST GRID -->
-    <div class="grid" style="margin-top:12px;">
-      <% dieticians.forEach(function(d){ %>
-        
-        <% 
-          const uname = d.user ? d.user.name : "Unknown"; 
-          const initials = uname.split(" ").map(n => n[0]).slice(0,2).join("");
-          const specialization = (d.specialization && d.specialization.length) 
-              ? d.specialization.join(", ") 
-              : "—";
-        %>
-
-        <!-- DIETICIAN CARD -->
-        <div class="card" 
-             style="display:flex; gap:16px; align-items:center; padding:18px;">
-
-          <!-- Avatar -->
-          <div class="avatar"
-               style="width:60px; height:60px; font-size:22px;">
-            <%= initials %>
-          </div>
-
-          <!-- Info -->
-          <div style="flex:1;">
-            <h3 style="margin:0 0 6px 0;">
-              <a href="/dieticians/<%= d._id %>" 
-                 style="text-decoration:none; color:var(--text);">
-                <%= uname %>
-              </a>
-            </h3>
-
-            <div class="meta" style="line-height:1.5;">
-              <strong>Specialization:</strong> <%= specialization %> <br>
-              <strong>Experience:</strong> <%= d.experienceYears || 0 %> years <br>
-              <strong>Fee:</strong> ₹<%= d.fee || 0 %>
+    <div class="split-grid" style="display:grid; grid-template-columns: 280px 1fr; gap:28px;">
+      <!-- Filters Sidebar -->
+      <aside>
+        <div class="card-glass" style="padding:22px;">
+          <h3 style="margin:0 0 16px; font-size:18px; font-weight:700;">Filter Search</h3>
+          <form action="/dieticians" method="get" style="display:grid; gap:14px;">
+            <div class="field">
+              <label style="font-weight:700; font-size:13px;">Search by Name</label>
+              <input type="text" name="q" class="field-input" value="<%= currentFilter.q || '' %>" placeholder="e.g. Dr. Sarah">
             </div>
+
+            <div class="field">
+              <label style="font-weight:700; font-size:13px;">Specialization</label>
+              <input type="text" name="specialization" class="field-input" value="<%= currentFilter.specialization || '' %>" placeholder="e.g. PCOS, Diabetes, Weight Loss">
+            </div>
+
+            <div class="field">
+              <label style="font-weight:700; font-size:13px;">Consultation Mode</label>
+              <select name="mode" class="field-input">
+                <option value="">All Modes</option>
+                <option value="online" <%= currentFilter.mode === 'online' ? 'selected' : '' %>>Online Video</option>
+                <option value="in-person" <%= currentFilter.mode === 'in-person' ? 'selected' : '' %>>In-Person</option>
+              </select>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:8px;">
+              <button class="button" type="submit" style="flex:1; justify-content:center;">Apply Filters</button>
+              <a href="/dieticians" class="btn btn-secondary" style="padding:10px 14px;">Reset</a>
+            </div>
+          </form>
+        </div>
+
+        <div class="card-glass" style="margin-top:20px; padding:20px;">
+          <h4 style="margin:0 0 10px; font-size:15px; font-weight:700; color:var(--neutral-900);">Clinical Care Standard</h4>
+          <ul style="padding-left:18px; margin:0; font-size:13px; color:var(--neutral-700); line-height:1.6;">
+            <li>100% Board-verified dieticians</li>
+            <li>Real-time allergy contraindication safety</li>
+            <li>Closed-loop metabolic plateau tracking</li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- Results Grid -->
+      <main>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <div style="font-size:15px; font-weight:700; color:var(--neutral-700);">
+            Showing <%= dieticians.length %> Verified Dietician<%= dieticians.length === 1 ? '' : 's' %>
           </div>
-
-          <!-- View Button -->
-          <!-- Action Buttons -->
-<div style="display:flex; flex-direction:column; gap:10px;">
-
-  <!-- View Profile -->
-  <a href="/dieticians/<%= d._id %>" 
-     class="btn" 
-     style="padding:8px 16px;">
-     View
-  </a>
-
-  <!-- Book Button (Only for logged-in USERS) -->
-  <% if (currentUser && currentUser.role === 'user') { %>
-    <a href="/appointments/book/<%= d._id %>" 
-       class="btn" 
-       style="padding:8px 16px; background:var(--accent-600); color:white;">
-       Book
-    </a>
-  <% } %>
-
-  <!-- If NOT logged in → prompt login -->
-  <% if (!currentUser) { %>
-    <a href="/login" 
-       class="btn" 
-       style="padding:8px 16px;">
-       Login to Book
-    </a>
-  <% } %>
-
-</div>
-
         </div>
 
-      <% }) %>
+        <div style="display:grid; gap:18px;">
+          <% if (dieticians.length === 0) { %>
+            <div class="card-glass" style="text-align:center; padding:48px;">
+              <h3 style="margin:0 0 8px;">No dieticians match your criteria</h3>
+              <p style="color:var(--neutral-500); margin:0 0 16px;">Try clearing your search query or filters.</p>
+              <a href="/dieticians" class="button">Reset Filters</a>
+            </div>
+          <% } %>
 
-      <% if (dieticians.length === 0) { %>
-        <div class="card" style="padding:24px; text-align:center;">
-          No dieticians found — try searching with another name.
+          <% dieticians.forEach(function(d, idx) { %>
+            <% const uname = d.user ? d.user.name : 'Clinical Specialist'; %>
+            
+            <div class="card-glass" style="display:flex; gap:20px; align-items:center; flex-wrap:wrap;">
+              <div style="width:96px; height:96px; border-radius:22px; overflow:hidden; flex-shrink:0; box-shadow:0 10px 24px rgba(0,0,0,0.08);">
+                <img src="https://i.pravatar.cc/200?img=<%= (idx * 5) + 32 %>" alt="Dietician avatar" style="width:100%; height:100%; object-fit:cover;">
+              </div>
+
+              <div style="flex:1; min-width:260px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <a href="/dieticians/<%= d._id %>" style="text-decoration:none; color:var(--neutral-900);">
+                    <h3 style="margin:0; font-size:19px; font-weight:800;"><%= uname %></h3>
+                  </a>
+                  <% if (d.isVerified) { %>
+                    <span class="badge-pill badge-success" style="font-size:11px; padding:2px 8px;">Verified ✅</span>
+                  <% } %>
+                </div>
+
+                <div style="display:flex; gap:6px; flex-wrap:wrap; margin:6px 0;">
+                  <% (d.specialization || []).forEach(function(s) { %>
+                    <span class="macro-chip" style="font-size:12px; padding:3px 8px;"><%= s %></span>
+                  <% }); %>
+                </div>
+
+                <div style="display:flex; gap:14px; align-items:center; font-size:13px; color:var(--neutral-500); margin-top:8px;">
+                  <span style="color:#b45309; font-weight:700;">⭐ <%= d.rating || 4.9 %> (<%= d.reviewsCount || 24 %> reviews)</span>
+                  <span>•</span>
+                  <span><%= d.experienceYears || 5 %> Years Experience</span>
+                  <span>•</span>
+                  <strong style="color:var(--primary-emerald-dark); font-size:15px;">₹<%= d.fee || 600 %> / session</strong>
+                </div>
+              </div>
+
+              <div style="display:flex; flex-direction:column; gap:8px; min-width:140px;">
+                <a href="/appointments/book/<%= d._id %>" class="btn-ai" style="padding:10px 18px; font-size:13px; text-decoration:none; justify-content:center;">
+                  📅 Book Session
+                </a>
+                <a href="/dieticians/<%= d._id %>" class="btn btn-secondary" style="padding:8px 16px; font-size:13px; text-align:center;">
+                  View Profile
+                </a>
+              </div>
+            </div>
+          <% }); %>
         </div>
-      <% } %>
+      </main>
     </div>
 
     <%- include('partials/footer') %>

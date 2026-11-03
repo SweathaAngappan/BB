@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+  <%- include('partials/head') %>
+<body>
+  <div class="container">
+    <%- include('partials/header') %>
+
+    <!-- Header Section -->
+    <section class="section" style="margin-bottom: 20px;">
+      <div class="page-heading" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+        <div>
+          <h1 style="font-size:28px; font-weight:800; color:var(--neutral-900); margin:0;">
+            🥗 7-Day Meal Plan
+          </h1>
+          <p class="meta" style="font-size:14px; color:var(--neutral-500); margin:4px 0 0;">
+            Prescribed by <strong><%= plan?.dietician?.user?.name || 'Your Dietician' %></strong>
+          </p>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <a class="button" href="/user/grocery-list" style="display:inline-flex; align-items:center; gap:6px;">
+            🛒 Consolidated Grocery List
+          </a>
+          <a class="btn btn-secondary" href="/dashboard">Back to Dashboard</a>
+        </div>
+      </div>
+    </section>
+
+    <% if (!plan) { %>
+      <div class="card-glass" style="text-align:center; padding:40px;">
+        <h3 style="margin:0 0 6px;">No Active Diet Plan</h3>
+        <p style="color:var(--neutral-500); margin:0 0 16px; font-size:14px;">
+          Book a consultation with a certified dietician to receive your tailored meal plan.
+        </p>
+        <a class="button" href="/dieticians">Find a Dietician</a>
+      </div>
+    <% } else { %>
+
+      <!-- Allergy & Contraindication Shield Banner -->
+      <% if (warnings && warnings.length > 0) { %>
+        <div class="contraindication-card" style="margin-bottom:20px;">
+          <div class="contraindication-title">
+            ⚠️ Health Contraindication Shield (<%= warnings.length %> Detected)
+          </div>
+          <div style="display:grid; gap:8px; margin-top:8px;">
+            <% warnings.forEach(function(w) { %>
+              <div style="background:#fff; border-radius:10px; padding:8px 12px; font-size:13px; border:1px solid #fecdd3; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <strong><%= w.mealDay %> - <%= w.mealType %>:</strong> <%= w.item %>
+                  <span style="color:#b91c1c; margin-left:6px;"><%= w.message %></span>
+                </div>
+                <span class="badge-pill badge-danger" style="font-size:11px;"><%= w.severity %> Risk</span>
+              </div>
+            <% }); %>
+          </div>
+        </div>
+      <% } %>
+
+      <!-- Plan Summary Cards -->
+      <div class="card-glass" style="margin-bottom:24px; padding:20px;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:16px;">
+          <div>
+            <div style="font-size:11px; font-weight:700; color:var(--neutral-500); text-transform:uppercase;">Goal</div>
+            <strong style="font-size:17px; color:var(--neutral-900);"><%= plan.goal %></strong>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:700; color:var(--neutral-500); text-transform:uppercase;">Daily Calories</div>
+            <strong style="font-size:17px; color:var(--primary-emerald-dark);"><%= plan.targetCaloriesDaily || 1800 %> kcal</strong>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:700; color:var(--neutral-500); text-transform:uppercase;">Macros (P / C / F)</div>
+            <strong style="font-size:16px; color:var(--neutral-800);">
+              <%= plan.targetProteinDaily || 75 %>g / <%= plan.targetCarbsDaily || 200 %>g / <%= plan.targetFatsDaily || 50 %>g
+            </strong>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:700; color:var(--neutral-500); text-transform:uppercase;">Status</div>
+            <span class="badge-pill <%= plan.active ? 'badge-success' : 'badge-warning' %>" style="font-size:12px;">
+              <%= plan.active ? 'Active' : 'Paused' %>
+            </span>
+          </div>
+        </div>
+
+        <% if (plan.clinicalNotes) { %>
+          <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--neutral-200); font-size:13px; color:var(--neutral-700);">
+            <strong>Dietician Advice:</strong> <%= plan.clinicalNotes %>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- 7 Days Grid -->
+      <div style="display:grid; gap:20px;">
+        <% days.forEach(function(day) { %>
+          <% const dayMeals = (plan.meals || []).filter(m => m.day === day); %>
+          <% if (dayMeals.length > 0) { %>
+            <div class="card-glass" style="padding:20px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid var(--neutral-100); padding-bottom:8px;">
+                <h3 style="margin:0; font-size:18px; font-weight:800; color:var(--neutral-900);">
+                  🗓️ <%= day %>
+                </h3>
+                <span class="badge-pill badge-info" style="font-size:12px;">
+                  <%= dayMeals.reduce((sum, m) => sum + (m.calories || 0), 0) %> kcal
+                </span>
+              </div>
+
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px;">
+                <% dayMeals.forEach(function(meal) { %>
+                  <div style="background:#ffffff; border:1px solid var(--neutral-200); border-radius:14px; padding:16px; display:flex; flex-direction:column; justify-content:space-between;">
+                    <div>
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <span class="badge-pill badge-purple" style="font-size:11px; padding:2px 8px;"><%= meal.mealType %></span>
+                        <strong style="color:var(--primary-emerald-dark); font-size:13px;"><%= meal.calories %> kcal</strong>
+                      </div>
+                      <div style="font-size:15px; font-weight:700; color:var(--neutral-900); margin-bottom:2px;">
+                        <%= meal.item %>
+                      </div>
+                      <div style="font-size:12px; color:var(--neutral-500); margin-bottom:10px;">
+                        Portion: <%= meal.portion || '1 serving' %>
+                      </div>
+                      
+                      <!-- Macro tags -->
+                      <div class="macro-group" style="margin-bottom:12px;">
+                        <% if (meal.protein) { %><span class="macro-chip protein" style="font-size:11px; padding:2px 6px;">🥩 <%= meal.protein %>g P</span><% } %>
+                        <% if (meal.carbs) { %><span class="macro-chip carbs" style="font-size:11px; padding:2px 6px;">🌾 <%= meal.carbs %>g C</span><% } %>
+                        <% if (meal.fats) { %><span class="macro-chip fats" style="font-size:11px; padding:2px 6px;">🥑 <%= meal.fats %>g F</span><% } %>
+                      </div>
+                    </div>
+
+                    <!-- 1-Click Swap Button (Feature 2) -->
+                    <button 
+                      type="button" 
+                      class="btn-sm-action btn-swap" 
+                      style="width:100%; justify-content:center; padding:8px 12px; font-size:12px;"
+                      onclick="openSwapModal('<%= meal._id %>', '<%= meal.item %>', <%= meal.calories %>, '<%= meal.mealType %>')"
+                    >
+                      🔄 Swap Meal
+                    </button>
+                  </div>
+                <% }); %>
+              </div>
+            </div>
+          <% } %>
+        <% }); %>
+      </div>
+    <% } %>
+
+    <%- include('partials/footer') %>
+  </div>
+
+  <!-- Smart Meal Swap Modal -->
+  <div class="modal-overlay" id="swapModalOverlay">
+    <div class="modal-dialog-box" style="max-width:540px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h3 style="margin:0; font-size:19px; font-weight:800; color:var(--neutral-900);">
+          🔄 Smart Meal Substitution
+        </h3>
+        <button type="button" style="background:none; border:none; font-size:22px; cursor:pointer;" onclick="closeSwapModal()">✕</button>
+      </div>
+
+      <p style="margin:0 0 14px; font-size:13px; color:var(--neutral-500);">
+        Swapping: <strong id="swapOriginalItem" style="color:var(--neutral-900);"></strong> (<span id="swapOriginalCalories"></span> kcal).
+        Select an equivalent macro-matched alternative:
+      </p>
+
+      <div id="substitutesContainer" style="display:grid; gap:10px;"></div>
+    </div>
+  </div>
+
+  <script>
+    async function openSwapModal(mealId, item, calories, mealType) {
+      const overlay = document.getElementById('swapModalOverlay');
+      document.getElementById('swapOriginalItem').textContent = item;
+      document.getElementById('swapOriginalCalories').textContent = calories;
+      overlay.classList.add('active');
+
+      const container = document.getElementById('substitutesContainer');
+      container.innerHTML = '<div style="text-align:center; padding:18px; color:var(--neutral-500); font-size:13px;">Finding macro-equivalent substitutes...</div>';
+
+      try {
+        const res = await fetch(`/user/substitutes?item=${encodeURIComponent(item)}&calories=${calories}&mealType=${encodeURIComponent(mealType)}`);
+        const data = await res.json();
+
+        if (data.success && data.substitutes.length > 0) {
+          container.innerHTML = data.substitutes.map(sub => `
+            <div class="card-glass" style="padding:14px; border:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; gap:12px;">
+              <div>
+                <strong style="font-size:14px; color:var(--neutral-900);">${sub.item}</strong>
+                <div style="font-size:12px; color:var(--neutral-500); margin-top:2px;">${sub.portion}</div>
+                <div class="macro-group" style="margin-top:6px;">
+                  <span class="macro-chip calories" style="font-size:11px;">${sub.calories} kcal (${sub.calorieDiff >= 0 ? '+' : ''}${sub.calorieDiff} kcal)</span>
+                  <span class="macro-chip protein" style="font-size:11px;">${sub.protein}g Protein</span>
+                </div>
+              </div>
+              <form action="/user/swap-meal" method="post" style="margin:0;">
+                <input type="hidden" name="mealId" value="${mealId}">
+                <input type="hidden" name="newItem" value="${sub.item}">
+                <input type="hidden" name="newPortion" value="${sub.portion}">
+                <input type="hidden" name="newCalories" value="${sub.calories}">
+                <input type="hidden" name="newProtein" value="${sub.protein}">
+                <input type="hidden" name="newCarbs" value="${sub.carbs}">
+                <input type="hidden" name="newFats" value="${sub.fats}">
+                <button type="submit" class="button" style="padding:7px 14px; font-size:12px;">Swap In</button>
+              </form>
+            </div>
+          `).join('');
+        } else {
+          container.innerHTML = '<div style="text-align:center; padding:14px; font-size:13px; color:var(--neutral-500);">No substitutes found for this item.</div>';
+        }
+      } catch (err) {
+        container.innerHTML = '<div style="color:red; text-align:center; padding:14px; font-size:13px;">Failed to load substitutes.</div>';
+      }
+    }
+
+    function closeSwapModal() {
+      document.getElementById('swapModalOverlay').classList.remove('active');
+    }
+  </script>
+</body>
+</html>

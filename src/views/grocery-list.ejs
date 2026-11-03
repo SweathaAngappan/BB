@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <%- include('partials/head') %>
+<body>
+  <div class="container">
+    <%- include('partials/header') %>
+
+    <!-- Header Section -->
+    <section class="section" style="margin-bottom: 20px;">
+      <div class="page-heading" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+        <div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <h1 style="font-size:28px; font-weight:800; color:var(--neutral-900); margin:0;">
+              🛒 7-Day Supermarket Grocery List
+            </h1>
+            <span class="badge-pill badge-success"><%= totalUniqueItems %> Unique Items</span>
+          </div>
+          <p class="meta" style="font-size:14px; color:var(--neutral-500); margin:4px 0 0;">
+            Aisle-categorized ingredients from your weekly meal plan
+          </p>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button type="button" class="btn btn-secondary" onclick="window.print()" style="font-size:13px; padding:8px 14px;">
+            🖨️ Print / Save PDF
+          </button>
+          <a class="button" href="/user/diet-plan" style="font-size:13px; padding:8px 14px;">
+            🥗 Back to Meal Plan
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <% if (!plan || totalUniqueItems === 0) { %>
+      <div class="card-glass" style="text-align:center; padding:40px;">
+        <h3 style="margin:0 0 6px;">No Grocery Items Generated</h3>
+        <p style="color:var(--neutral-500); margin:0 0 16px; font-size:14px;">
+          An active weekly meal plan is required to generate your grocery list.
+        </p>
+        <a class="button" href="/dieticians">Find a Dietician</a>
+      </div>
+    <% } else { %>
+      <!-- Plan summary banner -->
+      <div class="card-glass" style="margin-bottom:24px; padding:16px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div style="font-size:14px;">
+          <strong style="color:var(--neutral-900);">Prescribed by:</strong> <%= plan.dietician?.user?.name || 'Your Dietician' %>
+          <span style="margin:0 8px; color:var(--neutral-300);">|</span>
+          <strong style="color:var(--neutral-900);">Goal:</strong> <%= plan.goal %>
+        </div>
+        <div style="font-size:13px; color:var(--primary-emerald-dark); font-weight:700;" id="groceryProgress">
+          0 of <%= totalUniqueItems %> items gathered (0%)
+        </div>
+      </div>
+
+      <!-- Supermarket Aisles Grid -->
+      <div class="grocery-grid">
+        <% Object.keys(groceryAisles).forEach(function(aisleName) { %>
+          <% const items = groceryAisles[aisleName]; %>
+          <% if (items && items.length > 0) { %>
+            <div class="aisle-card">
+              <div class="aisle-header">
+                <div class="aisle-title">
+                  <% if (aisleName === 'Fresh Produce') { %>🥦<% } %>
+                  <% if (aisleName === 'Dairy, Eggs & Alternatives') { %>🥛<% } %>
+                  <% if (aisleName === 'Proteins, Lentils & Pulses') { %>🍗<% } %>
+                  <% if (aisleName === 'Grains, Flours & Breads') { %>🌾<% } %>
+                  <% if (aisleName === 'Pantry, Nuts, Seeds & Oils') { %>🫙<% } %>
+                  <%= aisleName %>
+                </div>
+                <span class="badge-pill badge-info" style="font-size:11px; padding:2px 8px;">
+                  <%= items.length %> items
+                </span>
+              </div>
+
+              <div>
+                <% items.forEach(function(item, idx) { %>
+                  <label class="grocery-item-row" id="row-<%= aisleName.replace(/[^a-zA-Z]/g, '') %>-<%= idx %>">
+                    <input 
+                      type="checkbox" 
+                      class="grocery-checkbox" 
+                      onchange="toggleGroceryCheck(this, 'row-<%= aisleName.replace(/[^a-zA-Z]/g, '') %>-<%= idx %>')"
+                    />
+                    <div style="flex:1;">
+                      <span style="font-weight:700; color:var(--neutral-900); font-size:14px;"><%= item.name %></span>
+                      <div style="font-size:12px; color:var(--neutral-500);"><%= item.estimatedQuantity %></div>
+                    </div>
+                  </label>
+                <% }) %>
+              </div>
+            </div>
+          <% } %>
+        <% }) %>
+      </div>
+    <% } %>
+
+    <%- include('partials/footer') %>
+  </div>
+
+  <script>
+    let checkedCount = 0;
+    const totalItems = <%= totalUniqueItems || 0 %>;
+
+    function toggleGroceryCheck(checkbox, rowId) {
+      const row = document.getElementById(rowId);
+      if (checkbox.checked) {
+        row.classList.add('checked');
+        checkedCount++;
+      } else {
+        row.classList.remove('checked');
+        checkedCount--;
+      }
+
+      const progress = document.getElementById('groceryProgress');
+      if (progress) {
+        progress.textContent = `${checkedCount} of ${totalItems} items gathered (${Math.round((checkedCount / Math.max(totalItems, 1)) * 100)}%)`;
+      }
+    }
+  </script>
+</body>
+</html>

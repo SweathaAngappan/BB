@@ -14,6 +14,10 @@ const StorySchema = new mongoose.Schema({
     ref: "User",
     default: null,
   },
+  beforeWeight: { type: Number },
+  afterWeight: { type: Number },
+  duration: { type: String, default: '3 months' },
+  isApproved: { type: Boolean, default: true },
   createdAt: {
     type: Date,
     default: Date.now,

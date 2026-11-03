@@ -1,0 +1,6 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'>
+  <rect width='64' height='64' rx='12' fill='#36a56c'/>
+  <g transform='translate(12,12)' fill='#fff' font-family='Arial' font-weight='700' font-size='28'>
+    <text x='0' y='28'>BB</text>
+  </g>
+</svg>

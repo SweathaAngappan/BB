@@ -10,18 +10,22 @@ router.get('/share-story', (req, res) => {
 // POST share-story form
 router.post('/share-story', async (req, res) => {
   try {
-    const { story, name } = req.body;
+    const { story, name, beforeWeight, afterWeight, duration } = req.body;
 
     await Story.create({
       story,
-      name: name || "Anonymous",
-      user: req.session.user ? req.session.user.id : null
+      name: name || (req.session.user ? req.session.user.name : "Anonymous"),
+      beforeWeight: beforeWeight ? Number(beforeWeight) : undefined,
+      afterWeight: afterWeight ? Number(afterWeight) : undefined,
+      duration: duration || "3 months",
+      user: req.session.user ? (req.session.user._id || req.session.user.id) : null,
+      isApproved: true
     });
 
-    req.session.success = "Thank you for sharing your story! 🙌";
+    req.session.success = "Thank you for inspiring the community with your wellness journey! 🙌";
     res.redirect('/');
   } catch (err) {
-    console.error(err);
+    console.error('SHARE STORY ERROR:', err);
     req.session.error = "Failed to submit your story.";
     res.redirect('/share-story');
   }

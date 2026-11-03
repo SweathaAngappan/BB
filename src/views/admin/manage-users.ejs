@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+  <%- include('../partials/head') %>
+<body>
+  <div class="container">
+    <%- include('../partials/header') %>
+
+    <div style="max-width:1200px; margin:20px auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h2 style="margin:0;">Manage Users</h2>
+        <a href="/admin/reports" class="btn btn-secondary">Reports</a>
+      </div>
+
+      <div class="card">
+        <table style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr style="text-align:left; color:var(--muted);">
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% users.forEach(u => { %>
+              <tr style="border-top:1px solid var(--border);">
+                <td><strong><%= u.name %></strong></td>
+                <td class="meta"><%= u.email %></td>
+                <td><%= u.role %></td>
+                <td>
+                  <form action="/admin/delete-user/<%= u._id %>" method="post" style="display:inline">
+                    <button class="btn btn-danger">Delete</button>
+                  </form>
+                  <a class="btn btn-secondary" href="/admin/edit-user/<%= u._id %>">Edit</a>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <%- include('../partials/footer') %>
+  </div>
+</body>
+</html>

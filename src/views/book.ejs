@@ -5,9 +5,9 @@
   <div class="container">
     <%- include('partials/header') %>
 
-    <div class="card" style="max-width:700px;margin:18px auto">
+    <div class="form-card" style="max-width:700px;margin:18px auto">
       <h2>Book with <%= dietician.user.name %></h2>
-      <form action="/appointments/checkout" method="post">
+      <form action="/appointments/checkout" method="post" class="form-panel">
         <input type="hidden" name="dieticianId" value="<%= dietician._id %>">
         <div class="field">
           <label>Choose date & time</label>
@@ -26,11 +26,9 @@
           <textarea name="notes"></textarea>
         </div>
 
-        <p style="color:var(--muted)">Fee: ₹<%= dietician.fee %></p>
+        <div class="meta">Fee: ₹<%= dietician.fee %></div>
 
-        
-
-        <button class="btn">Confirm booking — ₹<%= dietician.fee %></button>
+        <button class="button">Confirm booking — ₹<%= dietician.fee %></button>
       </form>
     </div>
 

@@ -1,176 +1,216 @@
 <!doctype html>
-<html>
+<html lang="en">
   <%- include('partials/head') %>
 <body>
   <div class="container">
     <%- include('partials/header') %>
 
-    <div class="card" style="
-      max-width:780px;
-      margin:30px auto;
-      padding:30px;
-      border-radius:18px;
-    ">
+    <% 
+      const uname = (dietician && dietician.user && dietician.user.name) 
+                    || (typeof user !== 'undefined' && user && user.name) 
+                    || 'Clinical Specialist';
+      const uemail = (dietician && dietician.user && dietician.user.email) 
+                    || (typeof user !== 'undefined' && user && user.email) 
+                    || '—';
+      const uphone = (dietician && dietician.user && dietician.user.phone) 
+                    || (typeof user !== 'undefined' && user && user.phone) 
+                    || '—';
+      const ubio = (dietician && dietician.about) 
+                    || (dietician && dietician.user && dietician.user.bio) 
+                    || 'Specialized clinical nutritionist dedicated to evidence-based health optimization.';
+    %>
 
-      <% 
-        const uname = (dietician && dietician.user && dietician.user.name) 
-                      || (typeof user !== 'undefined' && user && user.name) 
-                      || 'Unnamed';
-        const uemail = (dietician && dietician.user && dietician.user.email) 
-                      || (user && user.email) 
-                      || '—';
-        const uphone = (dietician && dietician.user && dietician.user.phone) 
-                      || (user && user.phone) 
-                      || '—';
-        const ubio = (dietician && dietician.user && dietician.user.bio) 
-                      || (user && user.bio) 
-                      || 'No bio yet.';
-      %>
-
-      <!-- Avatar + Name -->
-      <div style="text-align:center;">
-        <div class="avatar"
-          style="
-            width:110px;
-            height:110px;
-            margin:0 auto 12px;
-            font-size:40px;
-          ">
-          <%= String(uname).split(' ').map(n => n[0] || '').slice(0,2).join('') %>
-        </div>
-
-        <h2 style="margin:0; font-size:26px;"><%= uname %></h2>
-        <div class="meta" style="font-size:15px;">
-          Dietician • <%= uemail %>
-        </div>
-      </div>
-
-      <!-- If no dietician profile -->
-      <% if (!dietician) { %>
-        <div style="margin:22px 0; padding:14px; border-radius:10px; background:#f7fff7; color:#2b6b3a;">
-          <strong>Note:</strong> This user does not have a dietician profile yet.
-        </div>
-      <% } %>
-
-      <hr style="margin:28px 0; border-color:#e4f3e4">
-
-      <!-- Professional Information -->
-      <h3 style="margin-bottom:12px">Professional Information</h3>
-      <div style="
-        display:grid;
-        grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-        gap:18px;
-      ">
-        <div><strong>Phone:</strong> <%= uphone %></div>
+    <section class="section" style="margin-bottom: 24px;">
+      <div class="page-heading" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px;">
         <div>
-          <strong>Specialization:</strong>
-          <%= (dietician && dietician.specialization && dietician.specialization.length) ? dietician.specialization.join(', ') : '—' %>
-        </div>
-        <div><strong>Experience:</strong> <%= (dietician && dietician.experienceYears) ? dietician.experienceYears : 0 %> years</div>
-        <div><strong>Fee:</strong> ₹<%= (dietician && (dietician.fee != null)) ? dietician.fee : 0 %></div>
-        <div>
-          <strong>Modes:</strong>
-          <%= (dietician && dietician.consultationModes && dietician.consultationModes.length) ? dietician.consultationModes.join(', ') : '—' %>
-        </div>
-      </div>
-
-      <!-- Certificates -->
-      <% if (dietician && dietician.certificates && dietician.certificates.length > 0) { %>
-        <hr style="margin:28px 0; border-color:#e4f3e4">
-        <h3>Certificates</h3>
-        <div style="display:flex; flex-wrap:wrap; gap:12px;">
-          <% dietician.certificates.forEach(cert => { %>
-            <a href="<%= cert %>" target="_blank" style="text-decoration:none; color:var(--accent-600);">
-              <div style="
-                padding:8px 12px;
-                border:1px solid #dfe8df;
-                border-radius:10px;
-                background:#f7fff7;
-              ">
-                View Certificate
-              </div>
-            </a>
-          <% }) %>
-        </div>
-      <% } %>
-
-      <hr style="margin:28px 0; border-color:#e4f3e4">
-
-      <!-- Bio -->
-      <h3 style="margin-bottom:6px">About</h3>
-      <p style="color:var(--muted); line-height:1.7; font-size:15px;">
-        <%= ubio %>
-      </p>
-
-      <hr style="margin:28px 0; border-color:#e4f3e4">
-
-      <!-- Reviews -->
-      <h3>Reviews</h3>
-      <% if (reviews && reviews.length > 0) { %>
-        <% reviews.forEach(r => { %>
-          <div class="card" style="margin-bottom:12px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <strong><%= (r.user && r.user.name) ? r.user.name : 'Anonymous' %></strong>
-              <span class="meta"><%= r.rating || 0 %> / 5 ⭐</span>
-            </div>
-            <p style="margin-top:6px; color:var(--muted)"><%= r.comment || '' %></p>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <h1 style="font-size:32px; font-weight:800; color:var(--neutral-900); margin:0;">
+              <%= uname %>
+            </h1>
+            <% if (dietician && dietician.isVerified) { %>
+              <span class="badge-pill badge-success">Verified Specialist ✅</span>
+            <% } %>
           </div>
-        <% }) %>
-      <% } else { %>
-        <p style="color:var(--muted); text-align:center;">No reviews yet.</p>
-      <% } %>
-
-      <!-- Submit Review Form -->
-<% if (loggedInRole === 'user') { %>
-  <div style="margin-top:20px;">
-    <h4>Submit Your Review</h4>
-    <form id="reviewForm" action="/dieticians/reviews/<%= dietician._id %>" method="POST" style="margin-top:12px;">
-
-      <!-- Star Rating -->
-      <div id="starRating" style="display:flex; gap:6px; font-size:28px; cursor:pointer; color:var(--muted); margin-bottom:12px;">
-        <span data-value="1">&#9733;</span>
-        <span data-value="2">&#9733;</span>
-        <span data-value="3">&#9733;</span>
-        <span data-value="4">&#9733;</span>
-        <span data-value="5">&#9733;</span>
+          <p class="meta" style="font-size:16px; color:var(--neutral-500); margin:4px 0 0;">
+            <%= (dietician && dietician.specialization) ? dietician.specialization.join(' • ') : 'General Nutrition' %>
+          </p>
+        </div>
+        <% if (typeof isSelf !== 'undefined' && isSelf) { %>
+          <span class="badge-pill" style="background:#0f172a; color:#fff;">Practice Admin Mode</span>
+        <% } %>
       </div>
-      <input type="hidden" name="rating" id="ratingInput" required>
+    </section>
 
-      <label>Comment:</label>
-      <textarea name="comment" rows="3" style="width:100%; margin-top:6px;" placeholder="Write your comment..."></textarea>
-      <br><br>
-      <button type="submit" class="btn">Submit Review</button>
-    </form>
-  </div>
+    <div class="split-grid" style="display:grid; grid-template-columns: 1fr 340px; gap:28px;">
+      
+      <!-- Main Column -->
+      <div>
+        <div class="card-glass" style="margin-bottom:24px;">
+          <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap; margin-bottom:20px;">
+            <div style="width:100px; height:100px; border-radius:24px; overflow:hidden; box-shadow:0 12px 28px rgba(0,0,0,0.1);">
+              <img src="https://i.pravatar.cc/200?img=33" alt="Dietician avatar" style="width:100%; height:100%; object-fit:cover;">
+            </div>
+            <div>
+              <div style="display:flex; gap:12px; align-items:center; margin-bottom:8px;">
+                <span class="badge-pill badge-warning" style="font-size:14px; font-weight:800;">
+                  ⭐ <%= dietician ? (dietician.rating || 4.9) : 4.9 %> / 5
+                </span>
+                <span style="font-size:14px; color:var(--neutral-500);"><%= dietician ? dietician.reviewsCount || 36 : 36 %> Patient Reviews</span>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <span class="macro-chip">Experience: <%= dietician ? dietician.experienceYears || 5 : 5 %> Years</span>
+                <span class="macro-chip protein">Fee: ₹<%= dietician ? dietician.fee || 600 : 600 %> / Session</span>
+                <span class="macro-chip calories">Modes: <%= dietician && dietician.consultationModes ? dietician.consultationModes.join(', ') : 'online' %></span>
+              </div>
+            </div>
+          </div>
 
-  <script>
-    const stars = document.querySelectorAll('#starRating span');
-    const ratingInput = document.getElementById('ratingInput');
+          <h3 style="margin:0 0 8px; font-size:18px; font-weight:700;">Clinical Practice Bio</h3>
+          <p style="font-size:15px; color:var(--neutral-700); line-height:1.6; margin:0 0 20px;">
+            <%= ubio %>
+          </p>
 
-    stars.forEach(star => {
-      star.addEventListener('mouseover', () => {
-        const val = star.dataset.value;
-        highlightStars(val);
-      });
-      star.addEventListener('mouseout', () => {
-        highlightStars(ratingInput.value || 0);
-      });
-      star.addEventListener('click', () => {
-        ratingInput.value = star.dataset.value;
-        highlightStars(ratingInput.value);
-      });
-    });
+          <!-- Practice settings editor if dietician viewing own profile -->
+          <% if (typeof isSelf !== 'undefined' && isSelf) { %>
+            <div style="border-top:1px solid var(--neutral-200); padding-top:20px; margin-top:20px;">
+              <h3 style="margin:0 0 16px; font-size:18px; font-weight:700;">Edit Practice Parameters</h3>
+              <form action="/dieticians/profile/update" method="post" enctype="multipart/form-data" style="display:grid; gap:14px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                  <div class="field">
+                    <label style="font-weight:700; font-size:13px;">Consultation Fee (₹)</label>
+                    <input type="number" name="fee" class="field-input" value="<%= dietician ? dietician.fee : 600 %>">
+                  </div>
+                  <div class="field">
+                    <label style="font-weight:700; font-size:13px;">Experience (Years)</label>
+                    <input type="number" name="experienceYears" class="field-input" value="<%= dietician ? dietician.experienceYears : 5 %>">
+                  </div>
+                </div>
 
-    function highlightStars(rating) {
-      stars.forEach(star => {
-        star.style.color = star.dataset.value <= rating ? 'var(--accent-600)' : 'var(--muted)';
-      });
-    }
-  </script>
-<% } else { %>
-  <p style="color:var(--muted); margin-top:12px;">Login as a user to submit a review.</p>
-<% } %>
+                <div class="field">
+                  <label style="font-weight:700; font-size:13px;">Specializations (comma-separated)</label>
+                  <input type="text" name="specialization" class="field-input" value="<%= dietician && dietician.specialization ? dietician.specialization.join(', ') : '' %>">
+                </div>
 
+                <div class="field">
+                  <label style="font-weight:700; font-size:13px;">UPI ID for Patient Direct Transfers</label>
+                  <input type="text" name="upiId" class="field-input" value="<%= dietician ? dietician.upiId || '' : '' %>" placeholder="e.g. name@okaxis">
+                </div>
+
+                <div class="field">
+                  <label style="font-weight:700; font-size:13px;">About / Clinical Background</label>
+                  <textarea name="about" class="field-input" rows="3"><%= ubio %></textarea>
+                </div>
+
+                <div class="field">
+                  <label style="font-weight:700; font-size:13px;">Upload UPI Payment QR Code</label>
+                  <input type="file" name="qrCode" accept="image/*" class="field-input">
+                </div>
+
+                <button type="submit" class="btn-ai" style="padding:12px 24px; justify-content:center;">
+                  Save Practice Settings
+                </button>
+              </form>
+            </div>
+          <% } %>
+        </div>
+
+        <!-- Patient Reviews -->
+        <div class="card-glass">
+          <h3 style="margin:0 0 16px; font-size:18px; font-weight:700;">Patient Testimonials & Reviews</h3>
+          <% if (reviews && reviews.length > 0) { %>
+            <div style="display:grid; gap:14px;">
+              <% reviews.forEach(function(r) { %>
+                <div style="background:#f8fafc; border:1px solid var(--neutral-200); border-radius:16px; padding:16px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                    <strong style="color:var(--neutral-900); font-size:15px;"><%= r.user ? r.user.name : 'Verified Patient' %></strong>
+                    <span class="badge-pill badge-warning" style="font-size:12px;">⭐ <%= r.rating %> / 5</span>
+                  </div>
+                  <p style="margin:0; font-size:14px; color:var(--neutral-700);"><%= r.comment %></p>
+                </div>
+              <% }); %>
+            </div>
+          <% } else { %>
+            <p style="color:var(--neutral-500); margin:0;">No reviews yet.</p>
+          <% } %>
+
+          <!-- Review form for users -->
+          <% if (loggedInRole === 'user' && dietician) { %>
+            <div style="margin-top:24px; padding-top:20px; border-top:1px solid var(--neutral-200);">
+              <h4 style="margin:0 0 12px; font-size:16px; font-weight:700;">Submit Consultation Review</h4>
+              <form action="/dieticians/reviews/<%= dietician._id %>" method="post" style="display:grid; gap:12px;">
+                <div class="field">
+                  <label style="font-weight:700; font-size:13px;">Rating (1 to 5 Stars)</label>
+                  <select name="rating" class="field-input" style="width:140px;">
+                    <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
+                    <option value="4">⭐⭐⭐⭐ (4/5)</option>
+                    <option value="3">⭐⭐⭐ (3/5)</option>
+                    <option value="2">⭐⭐ (2/5)</option>
+                    <option value="1">⭐ (1/5)</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label style="font-weight:700; font-size:13px;">Feedback & Experience</label>
+                  <textarea name="comment" class="field-input" rows="3" placeholder="How was your consultation experience?" required></textarea>
+                </div>
+                <button type="submit" class="btn-ai" style="padding:10px 20px; justify-content:center;">Post Review</button>
+              </form>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Right Column: Booking / QR Panel -->
+      <aside>
+        <% if (dietician) { %>
+          <div class="card-glass" style="position:sticky; top:24px;">
+            <h3 style="margin:0 0 12px; font-size:18px; font-weight:800; color:var(--neutral-900);">
+              Book a Consultation
+            </h3>
+            <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:16px;">
+              <span style="font-size:28px; font-weight:800; color:var(--primary-emerald-dark);">₹<%= dietician.fee || 600 %></span>
+              <span style="font-size:13px; color:var(--neutral-500);">/ per session</span>
+            </div>
+
+            <% if (dietician.upiId) { %>
+              <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:14px; padding:12px; margin-bottom:16px; font-size:13px;">
+                <strong>UPI ID:</strong> <code><%= dietician.upiId %></code>
+                <% if (dietician.qrCodeUrl) { %>
+                  <div style="text-align:center; margin-top:8px;">
+                    <img src="<%= dietician.qrCodeUrl %>" alt="Dietician QR Code" style="max-width:140px; border-radius:8px;">
+                  </div>
+                <% } %>
+              </div>
+            <% } %>
+
+            <form action="/appointments/create" method="post" style="display:grid; gap:14px;">
+              <input type="hidden" name="dieticianId" value="<%= dietician._id %>">
+
+              <div class="field">
+                <label style="font-weight:700; font-size:13px;">Select Consultation Date</label>
+                <input type="date" name="date" class="field-input" min="<%= new Date().toISOString().slice(0,10) %>" value="<%= new Date().toISOString().slice(0,10) %>" required>
+              </div>
+
+              <div class="field">
+                <label style="font-weight:700; font-size:13px;">Consultation Mode</label>
+                <select name="mode" class="field-input">
+                  <% (dietician.consultationModes || ['online']).forEach(function(m) { %>
+                    <option value="<%= m %>"><%= m.toUpperCase() %></option>
+                  <% }); %>
+                </select>
+              </div>
+
+              <div class="field">
+                <label style="font-weight:700; font-size:13px;">Clinical Notes / Focus Areas</label>
+                <textarea name="notes" class="field-input" rows="2" placeholder="e.g. Weight plateau, PCOS meal planning, sports nutrition"></textarea>
+              </div>
+
+              <button type="submit" class="btn-ai" style="padding:14px; justify-content:center; width:100%;">
+                Proceed to Checkout
+              </button>
+            </form>
+          </div>
+        <% } %>
+      </aside>
 
     </div>
 

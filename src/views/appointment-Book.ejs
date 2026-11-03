@@ -5,37 +5,54 @@
   <div class="container">
     <%- include('partials/header') %>
 
-    <div class="card" style="max-width:600px;margin:0 auto;padding:24px">
-      <h2>Book Appointment With <%= dietician.user.name %></h2>
+    <div class="form-card" style="max-width:900px;margin:0 auto;">
+      <div class="page-heading">
+        <div>
+          <h2>Book appointment with <strong><%= dietician.user.name %></strong></h2>
+          <p class="meta">Fee: ₹<%= dietician.fee %> • Experience: <%= dietician.experienceYears %> yrs</p>
+        </div>
+        <a href="/dieticians/<%= dietician._id %>" class="btn btn-secondary">View Profile</a>
+      </div>
 
-      <p class="meta">
-        Fee: ₹<%= dietician.fee %><br>
-        Experience: <%= dietician.experienceYears %> years
-      </p>
-
-      <form action="/appointments/create" method="post" style="margin-top:16px">
+      <form action="/appointments/create" method="post" class="split-grid form-panel">
         <input type="hidden" name="dieticianId" value="<%= dietician._id %>">
 
-        <div class="field">
-          <label>Date</label>
-          <input type="date" name="date" required>
+        <div>
+          <div class="field">
+            <label>Select date</label>
+            <input type="date" name="date" required>
+          </div>
+
+          <div class="field">
+            <label>Notes (optional)</label>
+            <textarea name="notes" rows="4"></textarea>
+          </div>
         </div>
 
-        <div class="field">
-          <label>Mode</label>
-          <select name="mode">
-            <% dietician.consultationModes.forEach(m => { %>
-              <option value="<%= m %>"><%= m %></option>
-            <% }) %>
-          </select>
-        </div>
+        <div>
+          <div class="field">
+            <label>Time</label>
+            <select name="time">
+              <option>09:00 AM</option>
+              <option>11:00 AM</option>
+              <option>02:00 PM</option>
+              <option>05:00 PM</option>
+            </select>
+          </div>
 
-        <div class="field">
-          <label>Notes (optional)</label>
-          <textarea name="notes" rows="3"></textarea>
-        </div>
+          <div class="field">
+            <label>Mode</label>
+            <select name="mode">
+              <% dietician.consultationModes.forEach(m => { %>
+                <option value="<%= m %>"><%= m %></option>
+              <% }) %>
+            </select>
+          </div>
 
-        <button class="btn" style="margin-top:12px">Confirm Booking</button>
+          <div class="form-actions">
+            <button class="button" style="width:100%;">Proceed to Payment</button>
+          </div>
+        </div>
       </form>
     </div>
 

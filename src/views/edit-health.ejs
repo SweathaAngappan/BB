@@ -1,31 +1,104 @@
 <!doctype html>
-<html>
+<html lang="en">
   <%- include('partials/head') %>
 <body>
   <div class="container">
     <%- include('partials/header') %>
 
-    <div class="card" style="max-width:500px;margin:20px auto;padding:20px;">
-      <h2>Update Health Info</h2>
+    <div class="card-glass" style="max-width:640px; margin:24px auto;">
+      <div style="margin-bottom:24px;">
+        <h2 style="font-size:26px; font-weight:800; color:var(--neutral-900); margin:0 0 6px;">
+          Update Health Profile & Dietary Restrictions
+        </h2>
+        <p style="font-size:14px; color:var(--neutral-500); margin:0;">
+          This data powers your AI nutritional calculations and the Clinical Contraindication Shield.
+        </p>
+      </div>
 
-      <% 
-        // Extra guards (protect against null user)
-        var u = (typeof user !== 'undefined' && user) ? user : {};
-      %>
+      <% var u = (typeof user !== 'undefined' && user) ? user : {}; %>
 
-      <form action="/user/edit-health" method="post">
+      <form action="/user/edit-health" method="post" style="display:grid; gap:18px;">
+        
+        <!-- Height & Weight -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div class="field">
+            <label style="font-weight:700;">Height (cm)</label>
+            <input type="number" name="height" class="field-input" value="<%= u.height || '' %>" placeholder="e.g. 165" required>
+          </div>
+          <div class="field">
+            <label style="font-weight:700;">Weight (kg)</label>
+            <input type="number" step="0.1" name="weight" class="field-input" value="<%= u.weight || '' %>" placeholder="e.g. 62.5" required>
+          </div>
+        </div>
 
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div class="field">
+            <label style="font-weight:700;">Target Weight (kg)</label>
+            <input type="number" step="0.1" name="targetWeight" class="field-input" value="<%= u.targetWeight || '' %>" placeholder="e.g. 58.0">
+          </div>
+          <div class="field">
+            <label style="font-weight:700;">Age (years)</label>
+            <input type="number" name="age" class="field-input" value="<%= u.age || '' %>" placeholder="e.g. 25">
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div class="field">
+            <label style="font-weight:700;">Gender</label>
+            <select name="gender" class="field-input">
+              <option value="female" <%= u.gender === 'female' ? 'selected' : '' %>>Female</option>
+              <option value="male" <%= u.gender === 'male' ? 'selected' : '' %>>Male</option>
+              <option value="other" <%= u.gender === 'other' ? 'selected' : '' %>>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label style="font-weight:700;">Dietary Preference</label>
+            <select name="dietaryPreference" class="field-input">
+              <option value="all" <%= u.dietaryPreference === 'all' ? 'selected' : '' %>>All / Flexible</option>
+              <option value="vegetarian" <%= u.dietaryPreference === 'vegetarian' ? 'selected' : '' %>>Vegetarian</option>
+              <option value="vegan" <%= u.dietaryPreference === 'vegan' ? 'selected' : '' %>>Vegan</option>
+              <option value="eggetarian" <%= u.dietaryPreference === 'eggetarian' ? 'selected' : '' %>>Eggetarian</option>
+              <option value="non-vegetarian" <%= u.dietaryPreference === 'non-vegetarian' ? 'selected' : '' %>>Non-Vegetarian</option>
+              <option value="jain" <%= u.dietaryPreference === 'jain' ? 'selected' : '' %>>Jain</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Allergies -->
         <div class="field">
-          <label>Height (cm)</label>
-          <input type="number" name="height" value="<%= (u.height !== undefined && u.height !== null) ? u.height : '' %>" required>
+          <label style="font-weight:700; color:#b91c1c;">Known Allergies (comma-separated)</label>
+          <input 
+            type="text" 
+            name="allergies" 
+            class="field-input" 
+            value="<%= (u.allergies || []).join(', ') %>" 
+            placeholder="e.g. lactose, peanuts, gluten, soy, eggs, shellfish"
+          >
+          <small style="color:var(--neutral-500); margin-top:4px;">Used by the Contraindication Shield to flag risky meals.</small>
+        </div>
+
+        <!-- Health Conditions -->
+        <div class="field">
+          <label style="font-weight:700; color:#b45309;">Health Conditions (comma-separated)</label>
+          <input 
+            type="text" 
+            name="healthConditions" 
+            class="field-input" 
+            value="<%= (u.healthConditions || []).join(', ') %>" 
+            placeholder="e.g. diabetes, hypertension, pcos, cholesterol, thyroid"
+          >
+          <small style="color:var(--neutral-500); margin-top:4px;">Helps dieticians calibrate glycemic and sodium levels.</small>
         </div>
 
         <div class="field">
-          <label>Weight (kg)</label>
-          <input type="number" name="weight" value="<%= (u.weight !== undefined && u.weight !== null) ? u.weight : '' %>" required>
+          <label style="font-weight:700;">Daily Calorie Goal (kcal)</label>
+          <input type="number" name="dailyCalorieTarget" class="field-input" value="<%= u.dailyCalorieTarget || 2000 %>">
         </div>
 
-        <button class="btn" style="margin-top:10px">Save</button>
+        <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:12px;">
+          <a href="/user/profile" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn-ai" style="padding:12px 28px;">Save Profile</button>
+        </div>
       </form>
     </div>
 

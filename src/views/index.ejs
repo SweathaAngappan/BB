@@ -1,106 +1,169 @@
 <!doctype html>
-<html>
+<html lang="en">
   <%- include('partials/head') %>
 <body>
   <div class="container">
     <%- include('partials/header') %>
 
-    <% if (success) { %>
-      <div class="card" style="border-left:4px solid #9fe0aa;margin-top:18px;padding:12px"><strong>Success:</strong> <%= success %></div>
-    <% } %>
-    <% if (error) { %>
-      <div class="card" style="border-left:4px solid #ffb4b4;margin-top:18px;padding:12px"><strong>Error:</strong> <%= error %></div>
-    <% } %>
+    <!-- Hero Section -->
+    <section class="hero" style="padding:40px 0;">
+      <div class="hero-copy">
+        <span class="badge-pill badge-success" style="margin-bottom:12px;">
+          🥗 Clinical & AI-Powered Nutrition
+        </span>
+        <h1 style="font-size:clamp(36px, 4.5vw, 52px); font-weight:800; line-height:1.1; color:var(--neutral-900); margin:0 0 16px;">
+          Eat Intelligently.<br>Live Powerfully.
+        </h1>
+        <p style="font-size:16px; color:var(--neutral-500); line-height:1.5; margin:0 0 24px;">
+          Certified dieticians, conversational AI food plate logging, dynamic macro-matched pantry swaps, and automated clinical adherence monitoring.
+        </p>
 
-    <section class="hero">
-      <div class="left">
-        <h2>Connect with certified dieticians for personalized nutrition plans</h2>
-        <p>Find experts, book appointments, and track progress — all in one simple, friendly place.</p>
+        <div class="hero-actions" style="display:flex; gap:12px; flex-wrap:wrap;">
+          <% if (!currentUser) { %>
+            <a href="/register" class="btn-ai" style="padding:14px 26px; text-decoration:none;">
+              🚀 Start Your Health Journey
+            </a>
+            <a href="/dieticians" class="btn btn-secondary" style="padding:14px 22px;">
+              Find Dieticians
+            </a>
+          <% } else if (currentUser.role === 'dietician') { %>
+            <a href="/appointments/clients" class="btn-ai" style="padding:14px 26px; text-decoration:none;">
+              🩺 Clinical Client Roster →
+            </a>
+          <% } else if (currentUser.role === 'admin') { %>
+            <a href="/admin" class="btn-ai" style="padding:14px 26px; text-decoration:none; background:#0f172a;">
+              ⚡ Admin Command Center →
+            </a>
+          <% } else { %>
+            <a href="/dashboard" class="btn-ai" style="padding:14px 26px; text-decoration:none;">
+              📊 Open Health Dashboard →
+            </a>
+            <a href="/user/diet-plan" class="btn btn-secondary" style="padding:14px 22px;">
+              My Diet Plan
+            </a>
+          <% } %>
+        </div>
 
-        <% if (!currentUser || currentUser.role === 'user') { %>
-          <a href="/dieticians" class="btn">Find a Dietician</a>
-        <% } %>
+        <!-- Metric highlights -->
+        <div style="display:flex; gap:20px; margin-top:28px; border-top:1px solid var(--neutral-200); padding-top:16px; flex-wrap:wrap;">
+          <div>
+            <strong style="font-size:20px; color:var(--neutral-900); font-weight:800;">100%</strong>
+            <div style="font-size:12px; color:var(--neutral-500);">Verified Clinicians</div>
+          </div>
+          <div>
+            <strong style="font-size:20px; color:var(--primary-emerald-dark); font-weight:800;">±10%</strong>
+            <div style="font-size:12px; color:var(--neutral-500);">Macro Equivalence</div>
+          </div>
+          <div>
+            <strong style="font-size:20px; color:#0284c7; font-weight:800;">Real-time</strong>
+            <div style="font-size:12px; color:var(--neutral-500);">Plateau Alerts</div>
+          </div>
+        </div>
+      </div>
 
-        <section class="hero" style="display:flex; gap:20px; flex-wrap:wrap;">
-  <!-- Left: Success Stories -->
-  <div style="flex:2; min-width:300px;">
-    <div class="card" style="padding:12px;">
-      <h3>Success Stories</h3>
-      <p style="color:var(--muted); margin-bottom:12px;">Real journeys and wins from users — inspiring and motivating.</p>
-
-      <% if (stories && stories.length > 0) { %>
-        <div style="display:flex; flex-wrap:wrap; gap:8px;">
-          <% stories.forEach(s => { %>
-            <div style="flex:1 1 140px; border:1px solid #e4f3e4; border-radius:8px; padding:10px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
-              <strong><%= s.name %></strong>
-              <p style="color:var(--muted); margin:6px 0; font-size:0.95rem;"><%= s.story %></p>
-              <small class="meta" style="color:var(--muted); font-size:0.8rem;">Shared on <%= new Date(s.createdAt).toLocaleDateString() %></small>
+      <div class="hero-media">
+        <div style="position:relative; width:100%; border-radius:28px; overflow:hidden; box-shadow:0 24px 50px rgba(16,185,129,0.16);">
+          <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=900&q=80&auto=format&fit=crop" alt="Healthy balanced bowl" style="width:100%; height:100%; display:block; object-fit:cover;">
+          
+          <!-- Floating interactive badge -->
+          <div style="position:absolute; bottom:16px; left:16px; right:16px; background:rgba(255,255,255,0.96); backdrop-filter:blur(10px); border-radius:18px; padding:14px 18px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 10px 24px rgba(0,0,0,0.1);">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:24px;">🥗</span>
+              <div>
+                <strong style="font-size:14px; color:var(--neutral-900); display:block;">Smart Food Plate AI</strong>
+                <span style="font-size:12px; color:var(--primary-emerald-dark); font-weight:700;">280 kcal • 18g Protein (A+ Grade)</span>
+              </div>
             </div>
-          <% }) %>
+            <span class="badge-pill badge-success" style="font-size:11px;">Active</span>
+          </div>
         </div>
-      <% } else { %>
-        <p style="color:var(--muted); margin-top:6px;">No success stories yet. Be the first to share yours!</p>
-      <% } %>
-    </div>
-  </div>
+      </div>
+    </section>
 
-  <!-- Right: Why The Balanced Bowl -->
-<div style="flex:2; min-width:200px;">
-  <div class="card" style="padding:20px; margin-top:20px; margin-bottom:20px;">
-    <h3 style="margin-top:2; margin-bottom:14px;">Why The Balanced Bowl?</h3>
-    <ul style="color: var(--muted); list-style: none; padding: 0; margin: 0;">
-      <li style="margin-bottom:8px;">Verified dieticians</li>
-      <li style="margin-bottom:8px;">Easy booking & secure payments</li>
-      <li>Track weight, goals and history</li>
-    </ul>
-  </div>
-</div>
+    <!-- 3 Golden Features Architecture Showcase -->
+    <section class="section" style="margin:40px 0;">
+      <div style="text-align:center; max-width:640px; margin:0 auto 30px;">
+        <span class="badge-pill badge-purple" style="margin-bottom:8px;">INNOVATION HIGHLIGHTS</span>
+        <h2 style="font-size:28px; font-weight:800; color:var(--neutral-900); margin:0 0 8px;">
+          The 3 Pillars of The Balanced Bowl
+        </h2>
+        <p style="font-size:14px; color:var(--neutral-500); margin:0;">
+          Eliminating friction in nutrition: automated macro logging, flexible recipe swaps, and closed-loop adherence.
+        </p>
+      </div>
 
-</section>
-
-
-    <% if (!currentUser || currentUser.role === 'user') { %>
-      <!-- User-facing grid -->
-      <section class="grid" style="margin-top:20px">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
         
-        <div class="card">
-          <h3>How it works</h3>
-          <ol style="color:var(--muted)">
-            <li>Search dieticians</li>
-            <li>Book a session</li>
-            <li>Receive personalized guidance</li>
-          </ol>
+        <!-- Pillar 1 -->
+        <div class="card-glass" style="border-top:4px solid var(--primary-emerald); padding:24px;">
+          <div style="font-size:28px; margin-bottom:10px;">🎙️</div>
+          <h3 style="font-size:18px; font-weight:800; color:var(--neutral-900); margin:0 0 6px;">
+            1. AI Natural Language Macro Logger
+          </h3>
+          <p style="font-size:14px; color:var(--neutral-700); line-height:1.5; margin:0 0 14px;">
+            Type meals naturally in plain English. The NLP engine parses ingredients, calculates macros (calories, protein, carbs, fats), and grades your plate.
+          </p>
+          <span class="badge-pill badge-info" style="font-size:11px;">Zero Manual Entry</span>
         </div>
-        <div class="card">
-          <h3>Secure Payments</h3>
 
-          <p style="color:var(--muted)">We integrate payments securely in production.</p>
+        <!-- Pillar 2 -->
+        <div class="card-glass" style="border-top:4px solid #f59e0b; padding:24px;">
+          <div style="font-size:28px; margin-bottom:10px;">🔄</div>
+          <h3 style="font-size:18px; font-weight:800; color:var(--neutral-900); margin:0 0 6px;">
+            2. Smart Pantry Swapper & Grocery List
+          </h3>
+          <p style="font-size:14px; color:var(--neutral-700); line-height:1.5; margin:0 0 14px;">
+            Missing ingredients? 1-Click "Swap Meal" finds macro-equivalent alternatives within ±10% calories. Consolidates a 7-day grocery list by supermarket aisle.
+          </p>
+          <span class="badge-pill badge-warning" style="font-size:11px;">Zero Diet Abandonment</span>
         </div>
-      </section>
-    <% } else { %>
-      <!-- Dietician-facing grid: show info relevant to dieticians -->
-      <section class="grid" style="margin-top:20px">
-        <div class="card">
-          <h3>Practice Highlights</h3>
-          <p style="color:var(--muted)">Manage bookings, review client progress, and grow your practice.</p>
+
+        <!-- Pillar 3 -->
+        <div class="card-glass" style="border-top:4px solid #0284c7; padding:24px;">
+          <div style="font-size:28px; margin-bottom:10px;">📊</div>
+          <h3 style="font-size:18px; font-weight:800; color:var(--neutral-900); margin:0 0 6px;">
+            3. Adherence & Metabolic Plateau Alerts
+          </h3>
+          <p style="font-size:14px; color:var(--neutral-700); line-height:1.5; margin:0 0 14px;">
+            Daily check-ins compute a 7-day compliance score. The engine flags metabolic plateaus (>80% adherence with static weight) for proactive dietician adjustments.
+          </p>
+          <span class="badge-pill badge-success" style="font-size:11px;">Clinical Provider Loop</span>
         </div>
-        <div class="card">
-          <h3>How it works</h3>
-          <ol style="color:var(--muted)">
-            <li>Set up your profile</li>
-            <li>Receive bookings from users</li>
-            <li>Provide consultations and follow-ups</li>
-          </ol>
+      </div>
+    </section>
+
+    <!-- Community Transformations -->
+    <% if (stories && stories.length > 0) { %>
+      <section class="section" style="margin-bottom:40px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+          <div>
+            <h2 style="font-size:22px; font-weight:800; color:var(--neutral-900); margin:0;">
+              ⭐ Patient Transformations
+            </h2>
+            <span class="meta" style="font-size:13px; color:var(--neutral-500);">Real patient results achieved with our dieticians</span>
+          </div>
+          <a href="/share-story" class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">+ Share Your Story</a>
         </div>
-        <div class="card">
-          <h3>Payments</h3>
-          <p style="color:var(--muted)">Payments are collected from users during booking (simulated in demo). Integrate Stripe/PayPal in production.</p>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:18px;">
+          <% stories.slice(0, 3).forEach(function(s) { %>
+            <div class="card-glass" style="padding:18px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <strong style="font-size:15px; color:var(--neutral-900);"><%= s.name %></strong>
+                <% if (s.beforeWeight && s.afterWeight) { %>
+                  <span class="badge-pill badge-success" style="font-size:11px;">
+                    -<%= (s.beforeWeight - s.afterWeight).toFixed(1) %> kg in <%= s.duration || '3 mo' %>
+                  </span>
+                <% } %>
+              </div>
+              <p style="font-size:13px; color:var(--neutral-700); line-height:1.5; margin:0;">
+                "<%= s.story %>"
+              </p>
+            </div>
+          <% }); %>
         </div>
       </section>
     <% } %>
-
-    
-
 
     <%- include('partials/footer') %>
   </div>

@@ -12,8 +12,24 @@ const userSchema = new mongoose.Schema({
 
   // User fields
   age: { type: Number },
-  height: { type: Number },
-  weight: { type: Number },
+  gender: { type: String, enum: ['male', 'female', 'other'], default: 'female' },
+  height: { type: Number }, // in cm
+  weight: { type: Number }, // in kg
+  targetWeight: { type: Number },
+  dietaryPreference: { 
+    type: String, 
+    enum: ['all', 'vegetarian', 'vegan', 'eggetarian', 'non-vegetarian', 'jain'], 
+    default: 'vegetarian' 
+  },
+  allergies: { 
+    type: [String], 
+    default: [] // e.g. ['peanuts', 'lactose', 'gluten', 'soy', 'shellfish', 'eggs'] 
+  },
+  healthConditions: { 
+    type: [String], 
+    default: [] // e.g. ['diabetes', 'hypertension', 'pcos', 'thyroid', 'cholesterol'] 
+  },
+  dailyCalorieTarget: { type: Number, default: 2000 },
 
   // Generic profile
   profileImage: { type: String },

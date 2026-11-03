@@ -3,13 +3,17 @@ const router = express.Router();
 const appointment = require('../controllers/appointmentController');
 
 router.get('/book/:id', appointment.bookPage);
+router.get('/create', (req, res) => res.redirect('/dieticians'));
+router.get('/checkout', (req, res) => res.redirect('/dieticians'));
+router.get('/pay', (req, res) => res.redirect('/dieticians'));
 router.post('/create', appointment.create);
 router.get('/my', appointment.myAppointments);
 
-// ⭐ NEW — Dietician: My Clients
+// Dietician: My Clients
 router.get('/clients', appointment.myClients);
 
 router.post('/cancel/:id', appointment.cancel);
+router.post('/complete/:id', appointment.completeAppointment);
 router.post('/remind/:id', appointment.sendReminder);
 
 // STEP 1: Show checkout/payment page

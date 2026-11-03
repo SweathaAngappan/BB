@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+  <%- include('partials/head') %>
+<body>
+  <div class="container">
+    <%- include('partials/header') %>
+
+    <section class="section" style="margin-bottom: 24px;">
+      <div class="page-heading" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px;">
+        <div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <h1 style="font-size:30px; font-weight:800; color:var(--neutral-900); margin:0;">
+              🩺 Clinical Diet Plan Builder
+            </h1>
+            <span class="badge-pill badge-info">Patient: <%= client.name %></span>
+          </div>
+          <p class="meta" style="font-size:15px; color:var(--neutral-500); margin:6px 0 0;">
+            Build and calibrate a custom 7-day nutritional prescription with automated contraindication detection.
+          </p>
+        </div>
+        <a class="btn btn-secondary" href="/appointments/clients">Back to Client Roster</a>
+      </div>
+    </section>
+
+    <!-- Client Clinical Health Profile Card -->
+    <div class="card-glass" style="margin-bottom:28px;">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:16px;">
+        <div>
+          <div style="font-size:12px; font-weight:700; color:var(--neutral-500); text-transform:uppercase;">Age & Gender</div>
+          <strong style="color:var(--neutral-800);"><%= client.age || 'N/A' %> yrs • <%= client.gender || 'Not specified' %></strong>
+        </div>
+        <div>
+          <div style="font-size:12px; font-weight:700; color:var(--neutral-500); text-transform:uppercase;">Height & Weight</div>
+          <strong style="color:var(--neutral-800);"><%= client.height || '--' %> cm • <%= client.weight || '--' %> kg</strong>
+        </div>
+        <div>
+          <div style="font-size:12px; font-weight:700; color:var(--neutral-500); text-transform:uppercase;">Target Weight</div>
+          <strong style="color:var(--primary-emerald-dark);"><%= client.targetWeight ? client.targetWeight + ' kg' : 'Maintenance' %></strong>
+        </div>
+        <div>
+          <div style="font-size:12px; font-weight:700; color:var(--neutral-500); text-transform:uppercase;">Dietary Preference</div>
+          <span class="badge-pill badge-purple"><%= client.dietaryPreference || 'all' %></span>
+        </div>
+      </div>
+
+      <!-- Known Allergies & Clinical Conditions -->
+      <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--neutral-100); display:flex; gap:20px; flex-wrap:wrap;">
+        <div>
+          <span style="font-size:12px; font-weight:700; color:#b91c1c;">RECORDED ALLERGIES:</span>
+          <% if (client.allergies && client.allergies.length > 0) { %>
+            <% client.allergies.forEach(function(a) { %>
+              <span class="badge-pill badge-danger" style="margin-left:4px; font-size:11px;"><%= a %></span>
+            <% }); %>
+          <% } else { %>
+            <span style="font-size:13px; color:var(--neutral-500); margin-left:4px;">None reported</span>
+          <% } %>
+        </div>
+
+        <div>
+          <span style="font-size:12px; font-weight:700; color:#b45309;">MEDICAL CONDITIONS:</span>
+          <% if (client.healthConditions && client.healthConditions.length > 0) { %>
+            <% client.healthConditions.forEach(function(c) { %>
+              <span class="badge-pill badge-warning" style="margin-left:4px; font-size:11px;"><%= c %></span>
+            <% }); %>
+          <% } else { %>
+            <span style="font-size:13px; color:var(--neutral-500); margin-left:4px;">None reported</span>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Contraindication Warnings -->
+    <% if (warnings && warnings.length > 0) { %>
+      <div class="contraindication-card">
+        <div class="contraindication-title">
+          ⚠️ Clinical Contraindication Warning (<%= warnings.length %> Potential Conflicts)
+        </div>
+        <p style="margin:0 0 10px; font-size:14px; color:#9f1239;">
+          One or more prescribed items conflict with patient health restrictions:
+        </p>
+        <div style="display:grid; gap:8px;">
+          <% warnings.forEach(function(w) { %>
+            <div style="background:#fff; border-radius:12px; padding:10px 14px; font-size:13px; border:1px solid #fecdd3; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <strong><%= w.mealDay %> (<%= w.mealType %>):</strong> <%= w.item %>
+                <div style="color:#b91c1c; font-size:12px; margin-top:2px;"><%= w.message %></div>
+                <div style="color:var(--neutral-700); font-size:12px; margin-top:1px;"><em>Recommended: <%= w.advice %></em></div>
+              </div>
+              <span class="badge-pill badge-danger"><%= w.severity %></span>
+            </div>
+          <% }); %>
+        </div>
+      </div>
+    <% } %>
+
+    <!-- Diet Plan Form -->
+    <div class="card-glass">
+      <form id="dietPlanForm" action="/dieticians/plan/<%= client._id %>" method="post">
+        
+        <!-- Target Settings -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:18px; margin-bottom:24px;">
+          <div class="field">
+            <label style="font-weight:700;">Primary Target Goal</label>
+            <input type="text" name="goal" class="field-input" value="<%= plan ? plan.goal : 'PCOS Balance & Lean Recomposition' %>" required>
+          </div>
+          <div class="field">
+            <label style="font-weight:700;">Daily Calorie Target (kcal)</label>
+            <input type="number" name="targetCaloriesDaily" class="field-input" value="<%= plan ? plan.targetCaloriesDaily : 1800 %>" required>
+          </div>
+          <div class="field">
+            <label style="font-weight:700;">Protein Target (grams)</label>
+            <input type="number" name="targetProteinDaily" class="field-input" value="<%= plan ? plan.targetProteinDaily : 80 %>" required>
+          </div>
+          <div class="field">
+            <label style="font-weight:700;">Start Date</label>
+            <input type="date" name="startDate" class="field-input" value="<%= plan && plan.startDate ? plan.startDate.toISOString().slice(0,10) : new Date().toISOString().slice(0,10) %>" required>
+          </div>
+        </div>
+
+        <div class="field" style="margin-bottom:24px;">
+          <label style="font-weight:700;">Dietician Clinical Advice / Guidance Notes</label>
+          <textarea name="clinicalNotes" class="field-input" rows="2" placeholder="e.g. Focus on hydration, avoid dairy after 6pm, increase dietary fiber with flaxseeds..."><%= plan ? plan.clinicalNotes : '' %></textarea>
+        </div>
+
+        <div class="field" style="flex-direction:row; align-items:center; gap:12px; margin-bottom:28px;">
+          <input type="checkbox" id="active" name="active" <%= (plan && plan.active) || !plan ? 'checked' : '' %> style="width:20px; height:20px; accent-color:var(--primary-emerald);" />
+          <label for="active" style="margin:0; font-weight:700; cursor:pointer;">Active Prescription (Visible on Client Portal)</label>
+        </div>
+
+        <!-- Weekly Meals Builder -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <div>
+            <h3 style="margin:0; font-size:20px; font-weight:800; color:var(--neutral-900);">Weekly Scheduled Meals</h3>
+            <span class="meta" style="font-size:13px;">Add structured meal items across the 7 days.</span>
+          </div>
+          <button type="button" id="addRowButton" class="button" style="display:inline-flex; align-items:center; gap:6px;">
+            + Add Meal Item
+          </button>
+        </div>
+
+        <input type="hidden" name="meals" id="mealsInput">
+
+        <div id="mealsTable" style="display:grid; gap:12px;"></div>
+
+        <div style="margin-top:28px; display:flex; justify-content:flex-end;">
+          <button type="submit" class="btn-ai" style="padding:16px 36px; font-size:16px;">
+            💾 Save & Sync Client Diet Plan
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <%- include('partials/footer') %>
+  </div>
+
+  <script>
+    const days = <%- JSON.stringify(days) %>;
+    const mealTypes = <%- JSON.stringify(mealTypes) %>;
+    const existingMeals = <%- JSON.stringify(plan ? plan.meals : []) %>;
+
+    const mealsTable = document.getElementById('mealsTable');
+    const mealsInput = document.getElementById('mealsInput');
+    const form = document.getElementById('dietPlanForm');
+    const addButton = document.getElementById('addRowButton');
+
+    function createMealRow(meal = {}) {
+      const row = document.createElement('div');
+      row.className = 'card-glass';
+      row.style.padding = '14px 18px';
+      row.style.display = 'grid';
+      row.style.gridTemplateColumns = '140px 140px 1.5fr 120px 90px 90px 40px';
+      row.style.gap = '10px';
+      row.style.alignItems = 'center';
+
+      // Day Select
+      const daySelect = document.createElement('select');
+      daySelect.className = 'field-input';
+      days.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d;
+        opt.textContent = d;
+        if ((meal.day || 'Monday') === d) opt.selected = true;
+        daySelect.appendChild(opt);
+      });
+
+      // Meal Type Select
+      const typeSelect = document.createElement('select');
+      typeSelect.className = 'field-input';
+      mealTypes.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t;
+        opt.textContent = t;
+        if ((meal.mealType || 'Breakfast') === t) opt.selected = true;
+        typeSelect.appendChild(opt);
+      });
+
+      // Item description
+      const itemInput = document.createElement('input');
+      itemInput.type = 'text';
+      itemInput.placeholder = 'Food item name (e.g. 2 Rotis + Dal)';
+      itemInput.value = meal.item || '';
+      itemInput.className = 'field-input';
+      itemInput.required = true;
+
+      // Portion
+      const portionInput = document.createElement('input');
+      portionInput.type = 'text';
+      portionInput.placeholder = 'Portion (1 cup)';
+      portionInput.value = meal.portion || '1 serving';
+      portionInput.className = 'field-input';
+
+      // Calories
+      const caloriesInput = document.createElement('input');
+      caloriesInput.type = 'number';
+      caloriesInput.placeholder = 'kcal';
+      caloriesInput.value = meal.calories || '';
+      caloriesInput.className = 'field-input';
+      caloriesInput.required = true;
+
+      // Protein
+      const proteinInput = document.createElement('input');
+      proteinInput.type = 'number';
+      proteinInput.placeholder = 'Protein (g)';
+      proteinInput.value = meal.protein || '';
+      proteinInput.className = 'field-input';
+
+      // Delete Button
+      const deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.innerHTML = '🗑️';
+      deleteBtn.style.background = 'none';
+      deleteBtn.style.border = 'none';
+      deleteBtn.style.cursor = 'pointer';
+      deleteBtn.style.fontSize = '18px';
+      deleteBtn.onclick = () => row.remove();
+
+      row.appendChild(daySelect);
+      row.appendChild(typeSelect);
+      row.appendChild(itemInput);
+      row.appendChild(portionInput);
+      row.appendChild(caloriesInput);
+      row.appendChild(proteinInput);
+      row.appendChild(deleteBtn);
+
+      row._data = { daySelect, typeSelect, itemInput, portionInput, caloriesInput, proteinInput };
+      return row;
+    }
+
+    if (existingMeals.length > 0) {
+      existingMeals.forEach(m => mealsTable.appendChild(createMealRow(m)));
+    } else {
+      mealsTable.appendChild(createMealRow({ day: 'Monday', mealType: 'Breakfast', item: 'Rolled Oats with Almond Milk & Chia Seeds', calories: 280, protein: 10 }));
+      mealsTable.appendChild(createMealRow({ day: 'Monday', mealType: 'Lunch', item: '2 Multigrain Rotis + Dal Tadka + Cucumber Salad', calories: 410, protein: 16 }));
+    }
+
+    addButton.addEventListener('click', () => {
+      mealsTable.appendChild(createMealRow());
+    });
+
+    form.addEventListener('submit', (e) => {
+      const rows = Array.from(mealsTable.children);
+      const mealsData = rows.map(r => ({
+        day: r._data.daySelect.value,
+        mealType: r._data.typeSelect.value,
+        item: r._data.itemInput.value,
+        portion: r._data.portionInput.value,
+        calories: Number(r._data.caloriesInput.value) || 0,
+        protein: Number(r._data.proteinInput.value) || 0
+      }));
+
+      mealsInput.value = JSON.stringify(mealsData);
+    });
+  </script>
+</body>
+</html>

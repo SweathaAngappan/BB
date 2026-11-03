@@ -1,6 +1,6 @@
-// controllers/authController.js
 const User = require('../models/User');
 const Dietician = require('../models/Dietician');
+const HealthLog = require('../models/HealthLog');
 
 // Show registration/login pages
 exports.showRegister = (req, res) => res.render('register');
@@ -18,8 +18,12 @@ exports.register = async (req, res) => {
       // USER fields
       u_phone,
       u_age,
+      u_gender,
       u_height,
       u_weight,
+      u_dietaryPreference,
+      u_allergies,
+      u_conditions,
       u_bio,
 
       // DIETICIAN fields
@@ -31,14 +35,25 @@ exports.register = async (req, res) => {
       d_bio
     } = req.body;
 
-    // Basic user data
-    const userData = { role, name, email, password };
+    // Check if email already registered
+    const existing = await User.findOne({ email });
+    if (existing) {
+      req.session.error = 'An account with this email already exists. Please login instead.';
+      return res.redirect('/login');
+    }
 
-    if (role === "user") {
+    // Basic user data
+    const userData = { role: role || 'user', name, email, password };
+
+    if (role === "user" || !role) {
       userData.phone = u_phone || "";
       userData.age = u_age ? Number(u_age) : null;
+      userData.gender = u_gender || "female";
       userData.height = u_height ? Number(u_height) : null;
       userData.weight = u_weight ? Number(u_weight) : null;
+      userData.dietaryPreference = u_dietaryPreference || "vegetarian";
+      userData.allergies = u_allergies ? u_allergies.split(',').map(s => s.trim()).filter(Boolean) : [];
+      userData.healthConditions = u_conditions ? u_conditions.split(',').map(s => s.trim()).filter(Boolean) : [];
       userData.bio = u_bio || "";
     }
 
@@ -52,55 +67,54 @@ exports.register = async (req, res) => {
 
     // ------------------ DIETICIAN: CREATE PROFILE ------------------
     if (role === "dietician") {
-      
-      // ⭐ Extract certificate files uploaded by multer
       const certificateFiles = req.files
         ? req.files.map(f => `/uploads/certificates/${f.filename}`)
         : [];
 
       const dieticianDoc = new Dietician({
         user: createdUser._id,
-        certificates: certificateFiles,  // ⭐ FILE PATHS STORED HERE
+        certificates: certificateFiles,
         specialization: d_specialization
           ? d_specialization.split(",").map(s => s.trim())
-          : [],
-        experienceYears: d_experienceYears
-          ? Number(d_experienceYears)
-          : 0,
-        fee: d_fee ? Number(d_fee) : 0,
+          : ['General Nutrition'],
+        experienceYears: d_experienceYears ? Number(d_experienceYears) : 1,
+        fee: d_fee ? Number(d_fee) : 600,
         consultationModes: d_modes
           ? d_modes.split(",").map(s => s.trim())
-          : []
+          : ['online']
       });
 
       await dieticianDoc.save();
 
-      // Store session
       req.session.user = {
         id: createdUser._id,
+        _id: createdUser._id,
         name: createdUser.name,
+        email: createdUser.email,
         role: createdUser.role
       };
 
-      req.session.success = "Dietician registration successful!";
-      return res.redirect("/profile");
+      req.session.success = "Dietician registration successful! Welcome to the panel.";
+      return res.redirect("/dieticians/profile");
     }
 
     // ------------------ REGULAR USER ------------------
     req.session.user = {
       id: createdUser._id,
+      _id: createdUser._id,
       name: createdUser.name,
+      email: createdUser.email,
       role: createdUser.role,
       height: createdUser.height,
       weight: createdUser.weight
     };
 
-    req.session.success = "User registration successful!";
+    req.session.success = `Welcome to The Balanced Bowl, ${createdUser.name}! Let's build your wellness journey.`;
     res.redirect("/user/profile");
 
   } catch (err) {
     console.error("REGISTRATION ERROR:", err);
-    req.session.error = "Registration failed. Please try again.";
+    req.session.error = "Registration failed: " + err.message;
     res.redirect("/register");
   }
 };
@@ -111,21 +125,36 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user || !(await user.comparePassword(password))) {
-      req.session.error = 'Invalid credentials';
+      req.session.error = 'Invalid email or password.';
       return res.redirect('/login');
     }
+
     req.session.user = {
       id: user._id,
+      _id: user._id,
       name: user.name,
+      email: user.email,
       role: user.role,
-      height: user.height, // ensures BMI works on login
+      height: user.height,
       weight: user.weight
     };
     req.session.success = `Welcome back, ${user.name}!`;
-    res.redirect('/');
+
+    // Role-specific landing redirect
+    if (user.role === 'admin') {
+      return res.redirect('/admin');
+    }
+    if (user.role === 'dietician') {
+      return res.redirect('/appointments/clients');
+    }
+    
+    // Regular user
+    const redirectTo = req.session.returnTo || '/dashboard';
+    delete req.session.returnTo;
+    res.redirect(redirectTo);
   } catch (err) {
-    console.error(err);
-    req.session.error = 'Login error';
+    console.error('LOGIN ERROR:', err);
+    req.session.error = 'Login error occurred';
     res.redirect('/login');
   }
 };
@@ -133,7 +162,7 @@ exports.login = async (req, res) => {
 // -------------------- LOGOUT --------------------
 exports.logout = (req, res) => {
   req.session.destroy(err => {
-    res.clearCookie('connect.sid');
+    res.clearCookie('bb.sid.v3');
     res.redirect('/');
   });
 };
@@ -146,73 +175,16 @@ exports.showProfile = async (req, res) => {
       return res.redirect('/login');
     }
 
-    const dbUser = await User.findById(req.session.user.id).lean();
-    if (!dbUser) {
-      req.session.error = 'User not found';
-      return res.redirect('/');
+    if (req.session.user.role === 'admin') {
+      return res.redirect('/admin');
+    }
+    if (req.session.user.role === 'dietician') {
+      return res.redirect('/dieticians/profile');
     }
 
-    // Helper functions for BMI
-    function calculateBMI(weight, height) {
-      if (!weight || !height) return null;
-      const h = Number(height) / 100; // cm → m
-      const w = Number(weight);
-      if (!h || !w || h === 0) return null;
-      return (w / (h * h)).toFixed(1);
-    }
-
-    function determineStatus(bmi) {
-      if (!bmi) return "No data";
-      const n = parseFloat(bmi);
-      if (n < 18.5) return "Underweight — Gotta improve! 💛";
-      if (n < 25)   return "Healthy — Looking good! 💚";
-      if (n < 30)   return "Overweight — Keep working! 🧡";
-      return "Obese — We can fix this together! ❤️";
-    }
-
-    // Dietician profile
-    if (dbUser.role === 'dietician') {
-      const dietician = await Dietician.findOne({ user: dbUser._id }).lean();
-      if (!dietician) {
-        req.session.error = 'Dietician profile not found';
-        return res.redirect('/');
-      }
-      return res.render('dietician-profile', { 
-        user: dbUser,
-        dietician,
-        reviews: [],
-        loggedInRole: dbUser.role 
-      });
-    }
-
-    // Regular user profile
-    const bmi = calculateBMI(dbUser.weight, dbUser.height);
-    const status = determineStatus(bmi);
-
-    return res.render('user-profile', {
-      user: dbUser,
-      bmi,
-      status,
-      loggedInRole: dbUser.role
-    });
-
+    return res.redirect('/user/profile');
   } catch (err) {
-    console.error('PROFILE ERROR:', err);
-    req.session.error = 'Cannot load profile';
+    console.error('PROFILE ROUTING ERROR:', err);
     res.redirect('/');
   }
-
-  const Story = require('../models/Story'); // add at top
-
-// inside showProfile before res.render for regular users:
-const stories = await Story.find({}).sort({ createdAt: -1 }).lean();
-
-return res.render('user-profile', {
-  user: dbUser,
-  bmi,
-  status,
-  loggedInRole: dbUser.role,
-  stories   // pass stories to EJS
-});
-
 };

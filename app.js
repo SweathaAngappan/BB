@@ -8,6 +8,7 @@ const MongoStore = require('connect-mongo');
 const cookieParser = require('cookie-parser');
 
 const connectDB = require('./src/config/db');
+const Story = require('./src/models/Story');
 
 const authRoutes = require('./src/routes/authRoutes');
 const dieticianRoutes = require('./src/routes/dieticianRoutes');
@@ -25,6 +26,7 @@ connectDB();
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'src', 'views'));
+app.engine('ejs', require('ejs').__express);
 
 // Middleware
 app.use(morgan('dev'));
@@ -78,9 +80,6 @@ app.use('/user', userRoutes);
 
 // Admin
 app.use('/admin', adminRoutes);
-
-// Homepage
-const Story = require('./src/models/Story'); // ADD this at the top of app.js with other requires
 
 // Homepage
 app.get('/', async (req, res) => {

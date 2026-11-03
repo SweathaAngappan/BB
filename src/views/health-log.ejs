@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <%- include('partials/head') %>
+<body>
+  <div class="container">
+    <%- include('partials/header') %>
+
+    <div class="card-glass" style="max-width:580px; margin:32px auto;">
+      <h2 style="font-size:26px; font-weight:800; color:var(--neutral-900); margin:0 0 6px;">
+        📝 Daily Health & Vital Metrics
+      </h2>
+      <p class="meta" style="font-size:15px; color:var(--neutral-500); margin:0 0 24px;">
+        Record today's weight, hydration, and subjective mood to correlate with your meal adherence.
+      </p>
+
+      <form id="healthLogForm" action="/user/log" method="post" style="display:grid; gap:16px;">
+        
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+          <div class="field">
+            <label style="font-weight:700; font-size:13px;">Current Weight (kg)</label>
+            <input type="number" name="weight" step="0.1" class="field-input" value="<%= user ? user.weight : '' %>" required>
+          </div>
+
+          <div class="field">
+            <label style="font-weight:700; font-size:13px;">Water Intake (ml)</label>
+            <input type="number" name="waterIntakeMl" class="field-input" value="2200" required>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+          <div class="field">
+            <label style="font-weight:700; font-size:13px;">Calories (Leave blank for auto-sync from meals)</label>
+            <input type="number" name="calories" class="field-input" placeholder="Auto-calculated if blank">
+          </div>
+
+          <div class="field">
+            <label style="font-weight:700; font-size:13px;">Daily Mood / Energy</label>
+            <select name="mood" class="field-input">
+              <option value="Energetic">⚡ Energetic & Vital</option>
+              <option value="Good" selected>😊 Good / Balanced</option>
+              <option value="Calm">🧘 Calm / Mindful</option>
+              <option value="Tired">🥱 Tired / Fatigued</option>
+              <option value="Stressed">🤯 High Stress</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label style="font-weight:700; font-size:13px;">Daily Reflection / Physical Symptoms</label>
+          <textarea name="note" class="field-input" rows="3" placeholder="How did you feel after meals? Any cravings or digestion notes?"></textarea>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:8px;">
+          <a href="/dashboard" class="btn btn-secondary">Cancel</a>
+          <button class="btn-ai" type="submit" style="padding:12px 28px;">Save Daily Vitals</button>
+        </div>
+      </form>
+    </div>
+
+    <%- include('partials/footer') %>
+  </div>
+</body>
+</html>

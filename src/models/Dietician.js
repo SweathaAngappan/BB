@@ -9,6 +9,10 @@ const dieticianSchema = new mongoose.Schema({
   certificates: [String],
   rating: { type: Number, default: 0 },
   reviewsCount: { type: Number, default: 0 },
+  isVerified: { type: Boolean, default: false },
+  about: { type: String, default: '' },
+  languages: { type: [String], default: ['English'] },
+  availableDays: { type: [String], default: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] },
 
   // NEW FIELDS FOR PAYMENT
   qrCodeUrl: { type: String },  // URL to the dietician's QR code image

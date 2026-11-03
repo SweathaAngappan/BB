@@ -1,42 +1,62 @@
 <header class="header">
   <div class="brand">
-    <div class="logo">BB</div>
-    <div>
-      <h1>The Balanced Bowl</h1>
-      <div style="font-size:12px;color:var(--muted)">Nutrition made simple</div>
-    </div>
+    <a href="/" style="display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit;">
+      <div class="logo" style="width:38px; height:38px; background:linear-gradient(135deg, #10b981, #059669); border-radius:12px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:20px; box-shadow:0 6px 14px rgba(16,185,129,0.25);">
+        🥗
+      </div>
+      <div>
+        <h1 style="font-size:18px; font-weight:800; letter-spacing:-0.02em; margin:0; color:var(--neutral-900);">The Balanced Bowl</h1>
+      </div>
+    </a>
   </div>
 
-  <nav class="nav">
-    <a href="/" class="button">Home</a>
-
+  <nav class="nav" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
     <% if (currentUser && currentUser.role === 'user') { %>
-      <a href="/dieticians">Find a Dietician</a>
-      <a href="/appointments/my">My Appointments</a>
+      <a href="/dashboard" id="nav-dashboard">Dashboard</a>
+      <a href="/user/diet-plan" id="nav-dietplan">Diet Plan</a>
+      <a href="/user/grocery-list" id="nav-grocery">Grocery List</a>
+      <a href="/dieticians" id="nav-dieticians">Dieticians</a>
+      <a href="/appointments/my" id="nav-appointments">Consultations</a>
     <% } %>
 
     <% if (currentUser && currentUser.role === 'dietician') { %>
-      <a href="/appointments/clients">My Clients</a>   <!-- ⭐ ADDED -->
+      <a href="/appointments/clients" id="nav-clients">Clients</a>
+      <a href="/dieticians/profile" id="nav-dietician-profile">Practice Profile</a>
+    <% } %>
+
+    <% if (currentUser && currentUser.role === 'admin') { %>
+      <a href="/admin" id="nav-admin" class="btn" style="background:#0f172a; color:#fff; font-weight:700; padding:6px 14px; font-size:13px;">
+        Admin
+      </a>
     <% } %>
 
     <% if (!currentUser) { %>
-      <a href="/login">Login</a>
-      <a href="/register" class="button">Sign up</a>
+      <a href="/dieticians">Dieticians</a>
+      <a href="/login" id="nav-login">Login</a>
+      <a href="/register" id="nav-register" class="button" style="background:var(--primary-emerald); color:#fff; padding:8px 16px; font-size:13px;">Sign Up</a>
     <% } else { %>
+      <div style="display:flex; align-items:center; gap:8px; margin-left:6px;">
+        <span class="nav-pill" style="background:var(--neutral-100); color:var(--neutral-800); font-weight:700; border-radius:10px; padding:6px 10px; font-size:12px;">
+          <%= currentUser.name ? currentUser.name.split(' ')[0] : 'User' %>
+        </span>
+        <a href="/profile" class="button" style="padding:6px 12px; font-size:12px;" id="nav-profile">Profile</a>
 
-      <span style="margin-left:10px; font-weight:600; color:var(--text)">
-        Hi, <%= currentUser.name %>!
-      </span>
-
-      <a href="/profile" class="button">Profile</a>
-
-      <% if (currentUser.role === 'admin') { %>
-        <a href="/admin" class="button">Admin</a>
-      <% } %>
-
-      <form action="/logout" method="post" style="display:inline">
-        <button class="btn" type="submit">Logout</button>
-      </form>
+        <form action="/logout" method="post" style="display:inline; margin:0;">
+          <button class="btn btn-secondary" style="padding:6px 12px; font-size:12px; border-radius:10px;" type="submit" id="nav-logout">Logout</button>
+        </form>
+      </div>
     <% } %>
   </nav>
+
+  <% if (success) { %>
+    <div id="flash-msg" class="flash flash-success" style="box-shadow:0 6px 18px rgba(16,185,129,0.12); border:1px solid #86efac; border-radius:12px; padding:10px 14px; font-size:14px;">
+      <%= success %>
+    </div>
+  <% } %>
+
+  <% if (error) { %>
+    <div id="flash-msg" class="flash flash-error" style="box-shadow:0 6px 18px rgba(244,63,94,0.12); border:1px solid #fca5a5; border-radius:12px; padding:10px 14px; font-size:14px;">
+      <%= error %>
+    </div>
+  <% } %>
 </header>

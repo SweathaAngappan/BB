@@ -1,34 +1,249 @@
 <!doctype html>
-<html>
+<html lang="en">
   <%- include('../partials/head') %>
 <body>
   <div class="container">
     <%- include('../partials/header') %>
-    <h2>Admin Dashboard</h2>
-    <div class="grid">
-      <div class="card">
-        <h3>Users</h3>
-        <ul>
-          <% users.forEach(u => { %>
-            <li><strong><%= u.name %></strong> — <%= u.email %> (<%= u.role %>)
-              <form action="/admin/delete-user/<%= u._id %>" method="post" style="display:inline">
-                <button style="margin-left:8px" class="btn">Delete</button>
-              </form>
-            </li>
-          <% }) %>
-        </ul>
+
+    <!-- Admin Header -->
+    <section class="section" style="margin-bottom: 24px;">
+      <div class="page-heading" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <h1 style="font-size:28px; font-weight:800; color:var(--neutral-900); margin:0;">
+            ⚡ Admin Command Center
+          </h1>
+          <span class="badge-pill" style="background:#0f172a; color:#fff; font-size:12px;">Root Access</span>
+        </div>
+        <div style="font-size:13px; color:var(--neutral-500);">
+          Platform governance, verification, and analytics
+        </div>
       </div>
-      <div class="card">
-        <h3>Dieticians</h3>
-        <% dieticians.forEach(d => { %>
-          <div><strong><%= d.user.name %></strong> — <%= d.specialization.join(', ') %></div>
-        <% }) %>
+    </section>
+
+    <!-- Platform Metric KPI Cards -->
+    <div class="admin-metric-grid" style="margin-bottom:28px;">
+      <div class="admin-stat-card">
+        <span style="font-size:12px; font-weight:700; color:var(--neutral-500); text-transform:uppercase;">Total Users</span>
+        <div class="admin-stat-number"><%= stats.totalUsers %></div>
+        <span style="font-size:12px; color:var(--primary-emerald-dark); font-weight:600;">Active Accounts</span>
       </div>
-      <div class="card">
-        <h3>Appointments</h3>
-        <p class="meta">Total: <%= appointments.length %></p>
+
+      <div class="admin-stat-card">
+        <span style="font-size:12px; font-weight:700; color:var(--neutral-500); text-transform:uppercase;">Dieticians</span>
+        <div class="admin-stat-number"><%= stats.totalDieticians %></div>
+        <span style="font-size:12px; color:#0284c7; font-weight:600;">Healthcare Providers</span>
+      </div>
+
+      <div class="admin-stat-card">
+        <span style="font-size:12px; font-weight:700; color:var(--neutral-500); text-transform:uppercase;">Consultations</span>
+        <div class="admin-stat-number"><%= stats.totalAppointments %></div>
+        <span style="font-size:12px; color:var(--neutral-700); font-weight:600;"><%= stats.completedAppts %> Completed • <%= stats.bookedAppts %> Upcoming</span>
+      </div>
+
+      <div class="admin-stat-card">
+        <span style="font-size:12px; font-weight:700; color:var(--neutral-500); text-transform:uppercase;">Gross Volume</span>
+        <div class="admin-stat-number" style="color:var(--primary-emerald-dark);">₹<%= stats.totalRevenue.toLocaleString() %></div>
+        <span style="font-size:12px; color:var(--neutral-500); font-weight:600;">Avg Adherence: <%= stats.avgAdherence %>%</span>
       </div>
     </div>
+
+    <!-- Section 1: Dietician Credentials & Verification -->
+    <section class="section" style="margin-bottom: 36px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h2 style="font-size:20px; font-weight:800; color:var(--neutral-900); margin:0;">
+          🩺 Dietician Verification
+        </h2>
+        <span class="meta" style="font-size:13px; color:var(--neutral-500);">Approve certified practitioners</span>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table class="table-modern">
+          <thead>
+            <tr>
+              <th>Dietician</th>
+              <th>Specialization</th>
+              <th>Experience</th>
+              <th>Fee</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% dieticians.forEach(function(d) { %>
+              <tr>
+                <td>
+                  <strong><%= d.user ? d.user.name : 'Unknown' %></strong>
+                  <div style="font-size:12px; color:var(--neutral-500);"><%= d.user ? d.user.email : '' %></div>
+                </td>
+                <td><%= (d.specialization || []).join(', ') %></td>
+                <td><%= d.experienceYears %> Years</td>
+                <td><strong>₹<%= d.fee || 500 %></strong></td>
+                <td>
+                  <% if (d.isVerified) { %>
+                    <span class="badge-pill badge-success" style="font-size:11px;">Verified ✅</span>
+                  <% } else { %>
+                    <span class="badge-pill badge-warning" style="font-size:11px;">Pending ⏳</span>
+                  <% } %>
+                </td>
+                <td>
+                  <form action="/admin/toggle-verify/<%= d._id %>" method="post" style="margin:0; display:inline;">
+                    <button type="submit" class="btn-sm-action <%= d.isVerified ? 'btn-skip' : 'btn-eaten' %>" style="font-size:12px;">
+                      <%= d.isVerified ? 'Revoke' : 'Verify' %>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 2: User Accounts & Role Governance -->
+    <section class="section" style="margin-bottom: 36px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h2 style="font-size:20px; font-weight:800; color:var(--neutral-900); margin:0;">
+          👥 User Accounts & Roles
+        </h2>
+        <span class="meta" style="font-size:13px; color:var(--neutral-500);">Assign roles and manage accounts</span>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table class="table-modern">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Email</th>
+              <th>Current Role</th>
+              <th>Change Role</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% users.forEach(function(u) { %>
+              <tr>
+                <td><strong><%= u.name %></strong></td>
+                <td><%= u.email %></td>
+                <td>
+                  <span class="badge-pill <%= u.role === 'admin' ? 'badge-danger' : (u.role === 'dietician' ? 'badge-info' : 'badge-success') %>" style="font-size:11px;">
+                    <%= u.role.toUpperCase() %>
+                  </span>
+                </td>
+                <td>
+                  <form action="/admin/change-role/<%= u._id %>" method="post" style="display:flex; gap:6px; margin:0;">
+                    <select name="role" class="field-input" style="padding:4px 8px; font-size:12px; border-radius:8px;">
+                      <option value="user" <%= u.role === 'user' ? 'selected' : '' %>>User</option>
+                      <option value="dietician" <%= u.role === 'dietician' ? 'selected' : '' %>>Dietician</option>
+                      <option value="admin" <%= u.role === 'admin' ? 'selected' : '' %>>Admin</option>
+                    </select>
+                    <button type="submit" class="btn-sm-action btn-swap" style="padding:4px 8px; font-size:12px;">Save</button>
+                  </form>
+                </td>
+                <td>
+                  <form action="/admin/delete-user/<%= u._id %>" method="post" style="margin:0; display:inline;" onsubmit="return confirm('Delete user account?')">
+                    <button type="submit" class="btn-sm-action btn-skip" style="color:#b91c1c; font-size:12px;">Delete</button>
+                  </form>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 3: Platform Consultations & Transactions -->
+    <section class="section" style="margin-bottom: 36px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h2 style="font-size:20px; font-weight:800; color:var(--neutral-900); margin:0;">
+          📑 Consultations & Transactions
+        </h2>
+        <span class="meta" style="font-size:13px; color:var(--neutral-500);">Audit appointments and payments</span>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table class="table-modern">
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Dietician</th>
+              <th>Date</th>
+              <th>Mode</th>
+              <th>Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% appointments.forEach(function(a) { %>
+              <tr>
+                <td><strong><%= a.user ? a.user.name : 'Unknown User' %></strong></td>
+                <td><%= a.dietician && a.dietician.user ? a.dietician.user.name : 'Unknown Dietician' %></td>
+                <td><%= new Date(a.date).toLocaleDateString() %></td>
+                <td><%= a.mode.toUpperCase() %></td>
+                <td><strong>₹<%= a.amount || (a.dietician ? a.dietician.fee : 600) %></strong></td>
+                <td>
+                  <span class="badge-pill <%= a.status === 'completed' ? 'badge-success' : (a.status === 'booked' ? 'badge-info' : 'badge-danger') %>" style="font-size:11px;">
+                    <%= a.status %>
+                  </span>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 4: Community Stories & Reviews Moderation -->
+    <section class="section" style="margin-bottom: 36px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h2 style="font-size:20px; font-weight:800; color:var(--neutral-900); margin:0;">
+          ⭐ Content Moderation
+        </h2>
+        <span class="meta" style="font-size:13px; color:var(--neutral-500);">Stories and dietician reviews</span>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:20px;">
+        <!-- Stories -->
+        <div class="card-glass" style="padding:20px;">
+          <h3 style="margin:0 0 12px; font-size:16px; font-weight:700;">Community Stories</h3>
+          <% if (!stories || stories.length === 0) { %>
+            <p style="color:var(--neutral-500); font-size:13px;">No stories submitted yet.</p>
+          <% } else { %>
+            <% stories.forEach(function(s) { %>
+              <div style="padding:10px 0; border-bottom:1px solid var(--neutral-100); display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+                <div>
+                  <strong style="font-size:14px;"><%= s.name %></strong>
+                  <p style="margin:2px 0 0; font-size:13px; color:var(--neutral-700);"><%= s.story %></p>
+                </div>
+                <form action="/admin/delete-story/<%= s._id %>" method="post" style="margin:0;">
+                  <button type="submit" class="btn-sm-action btn-skip" style="color:#b91c1c; font-size:11px; padding:4px 8px;">Remove</button>
+                </form>
+              </div>
+            <% }); %>
+          <% } %>
+        </div>
+
+        <!-- Reviews -->
+        <div class="card-glass" style="padding:20px;">
+          <h3 style="margin:0 0 12px; font-size:16px; font-weight:700;">Patient Reviews</h3>
+          <% if (!reviews || reviews.length === 0) { %>
+            <p style="color:var(--neutral-500); font-size:13px;">No reviews submitted yet.</p>
+          <% } else { %>
+            <% reviews.forEach(function(r) { %>
+              <div style="padding:10px 0; border-bottom:1px solid var(--neutral-100); display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+                <div>
+                  <strong style="font-size:13px; color:#d97706;">⭐ <%= r.rating %> / 5</strong>
+                  <div style="font-size:13px; color:var(--neutral-700); margin-top:2px;"><%= r.comment %></div>
+                </div>
+                <form action="/admin/delete-review/<%= r._id %>" method="post" style="margin:0;">
+                  <button type="submit" class="btn-sm-action btn-skip" style="color:#b91c1c; font-size:11px; padding:4px 8px;">Remove</button>
+                </form>
+              </div>
+            <% }); %>
+          <% } %>
+        </div>
+      </div>
+    </section>
+
     <%- include('../partials/footer') %>
   </div>
 </body>
