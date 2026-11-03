@@ -1,19 +1,22 @@
 {
   "name": "the-balanced-bowl",
   "version": "1.0.0",
-  "description": "The Balanced Bowl - dietician booking platform (MVC)",
+  "description": "The Balanced Bowl - dietician booking platform (MERN Architecture)",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "seed": "node src/config/seed.js"
+    "seed": "node src/config/seed.js",
+    "client": "npm --prefix client run dev",
+    "client:build": "npm --prefix client run build"
   },
-  "author": "Codeverse (Team 10)",
+  "author": "Sweatha A M",
   "license": "MIT",
   "dependencies": {
     "bcrypt": "^5.1.0",
     "connect-mongo": "^4.6.0",
     "cookie-parser": "^1.4.6",
+    "cors": "^2.8.6",
     "dotenv": "^16.6.1",
     "ejs": "^3.1.10",
     "express": "^4.22.1",
@@ -28,5 +31,13 @@
   "devDependencies": {
     "nodemon": "^3.1.11"
   },
-  "keywords": []
+  "keywords": [
+    "mern",
+    "react",
+    "material-ui",
+    "mongodb",
+    "express",
+    "nutrition",
+    "clinical"
+  ]
 }

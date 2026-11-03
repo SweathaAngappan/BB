@@ -16,6 +16,8 @@ const appointmentRoutes = require('./src/routes/appointmentRoutes');
 const adminRoutes = require('./src/routes/adminRoutes');
 const miscRoutes = require('./src/routes/miscRoutes');
 const userRoutes = require('./src/routes/userRoutes');
+const apiRoutes = require('./src/routes/apiRoutes');
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -29,6 +31,7 @@ app.set('views', path.join(__dirname, 'src', 'views'));
 app.engine('ejs', require('ejs').__express);
 
 // Middleware
+app.use(cors({ origin: true, credentials: true }));
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -62,6 +65,9 @@ app.use((req, res, next) => {
 // ---------------------------------------------------
 // ROUTES (order matters!)
 // ---------------------------------------------------
+
+// REST API (For React MERN Client)
+app.use('/api', apiRoutes);
 
 // Auth (must be first for /register, /login)
 app.use('/', authRoutes);

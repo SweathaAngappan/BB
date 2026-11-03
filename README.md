@@ -1,54 +1,40 @@
-# The Balanced Bowl 🥗🥣
+# The Balanced Bowl 🥗🥣 (MERN Stack Edition)
 
-> An intelligent, full-stack clinical nutrition management and dietician tele-consultation platform built with Node.js, Express, MongoDB, and modern responsive web technologies.
+> An intelligent, full-stack clinical nutrition management and dietician tele-consultation platform built with the **MERN Stack (MongoDB, Express.js, React.js, Node.js)** and **Material UI**.
 
-[![Node.js](https://img.shields.io/badge/Node.js-v18+-green.svg)](https://nodejs.org/)
-[![Express.js](https://img.shields.io/badge/Express.js-4.x-black.svg)](https://expressjs.com/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-brightgreen.svg)](https://www.mongodb.com/)
-[![Frontend](https://img.shields.io/badge/Frontend-HTML5%20%7C%20CSS3%20%7C%20JavaScript-blue.svg)]()
+[![React.js](https://img.shields.io/badge/Frontend-React%2018%20%2B%20Material%20UI-007FFF.svg)](https://react.dev/)
+[![Node.js](https://img.shields.io/badge/Backend-Node.js%20%7C%20Express.js-green.svg)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/Database-MongoDB%20(Mongoose)-brightgreen.svg)](https://www.mongodb.com/)
+[![HTML5 & CSS3](https://img.shields.io/badge/UI-HTML5%20%7C%20CSS3%20%7C%20Responsive-orange.svg)]()
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
 ## 🌟 Overview
 
-**The Balanced Bowl** bridges the gap between clinical nutrition advice and real-world dietary adherence. It empowers certified dieticians to create tailored meal programs and track patient progress, while offering patients an intuitive, interactive space to log daily meals, track biometrics, avoid medical allergens, and book one-on-one consultations.
+**The Balanced Bowl** bridges the gap between clinical nutrition advice and real-world dietary adherence. It empowers certified dieticians to create tailored meal protocols and monitor patient compliance, while offering patients an interactive, responsive portal to log daily meals, track biometrics, avoid medical allergens, and book tele-consultations.
+
+Built from the ground up to showcase **modern component-driven web engineering**, **MERN stack architecture**, and **clinical decision engines**.
 
 ---
 
-## ✨ Key Features
+## ✨ Key Technical Highlights (Citi Evaluated Core Stack)
 
-### 🛡️ Clinical Safety & Allergy Shield
-* **Contraindication Engine**: Cross-references patient health profiles (e.g., Diabetes, Hypertension, Renal concerns) against meal items to flag clinical risks.
-* **Allergen Detection**: Automated detection for common allergens (Gluten, Lactose, Peanuts, Soy, Shellfish) with immediate severity alerts.
+### ⚛️ Frontend: React 18 with Responsive Design & Material UI (MUI)
+* **Modular Component Architecture**: Reusable UI cards, custom theme providers, and dynamic modals.
+* **Responsive Layouts**: Engineered using Material UI's Grid, Container, and `useMediaQuery` breakpoints for flawless mobile, tablet, and desktop experiences.
+* **State Management & Routing**: Stateful consultation booking dialogs, reactive metric trackers, and client-side page routing via `react-router-dom`.
 
-### 🔄 Intelligent Substitution Engine
-* Suggests healthy, context-aware ingredient alternatives based on user dietary preferences (Vegan, Keto, Low-GI) and medical restrictions.
+### 🛡️ Clinical Intelligence & Safety Shields
+* **Allergen & Contraindication Shield**: Algorithmic cross-referencing between patient health profiles (e.g., Diabetes, Hypertension, Renal concerns) and meals to prevent adverse dietary reactions.
+* **Intelligent Ingredient Substitution Engine**: Automated recommendation of nutrient-dense alternatives for dairy-free, low-GI, keto, or gluten-free restrictions.
 
-### 📊 Health & Meal Adherence Logging
-* Daily meal tracking with real-time adherence scoring.
-* Visual health logging for weight, calories, blood sugar, and biometric milestones.
-* Automated dynamic grocery checklist generation for active meal plans.
+### 🍃 Database: MongoDB & Mongoose
+* **Flexible Document Modeling**: Structured schemas for `User`, `DietPlan`, `HealthLog`, `MealLog`, and `Appointment`.
+* **Sub-second RESTful APIs**: Asynchronous query optimizations and aggregation pipelines.
 
-### 📅 Consultation & Appointment Management
-* Multi-slot appointment scheduling between patients and verified dieticians.
-* Integrated payment checkout workflows (Razorpay integration).
-* Automated email confirmations and status tracking.
-
-### 👥 Role-Based Access Control (RBAC)
-* **Patients**: Explore dietician profiles, book consultations, access meal plans, and log health metrics.
-* **Dieticians**: Manage clients, build customized diet plans, and view compliance metrics.
-* **Admin**: Verify dietician certifications, manage platform users, and review platform feedback.
-
----
-
-## 🛠️ Tech Stack
-
-* **Frontend**: HTML5, CSS3, Modern Responsive UI, JavaScript (ES6+), EJS Templates
-* **Backend**: Node.js, Express.js (MVC Architecture)
-* **Database**: MongoDB with Mongoose ODM (Session store via connect-mongo)
-* **Authentication & Security**: BCrypt password hashing, Cookie/Session-based authentication, RBAC middleware
-* **Integrations**: Razorpay API (Payments), Nodemailer (Transactional Emails), Multer (Certificate Uploads)
+### 🚀 Backend: Node.js & Express.js
+* RESTful API architecture with CORS security, session authentication, and clean separation between controller business logic and clinical utility engines.
 
 ---
 
@@ -56,19 +42,25 @@
 
 ```text
 BB/
-├── app.js                   # Application entry point & middleware configuration
-├── package.json             # Dependencies and scripts
-├── .env.example             # Template for environment variables
-├── src/
-│   ├── config/              # Database connection & seed data
-│   ├── controllers/         # Business logic for auth, dieticians, users, admin
-│   ├── middleware/          # Authentication & role-authorization guards
+├── client/                  # ⚛️ React 18 + Material UI Frontend Application
+│   ├── src/
+│   │   ├── components/      # Responsive Navbar, Footer, UI components
+│   │   ├── pages/           # Home, Dietitians Directory, Dashboard, Allergy Shield
+│   │   ├── theme.js         # Custom Material UI theme (Healthcare palette)
+│   │   ├── App.jsx          # Route declarations & theme wrapper
+│   │   └── main.jsx         # React DOM root entry
+│   ├── index.html           # HTML5 entry with Google Font typography
+│   └── package.json         # Client dependencies (@mui/material, react-router-dom, axios)
+│
+├── src/                     # 🚀 Express & MongoDB Backend
+│   ├── config/              # MongoDB connection & database seeds
+│   ├── controllers/         # Business logic for auth, dieticians, appointments, users
 │   ├── models/              # Mongoose schemas (User, Dietician, Appointment, DietPlan, etc.)
-│   ├── routes/              # Express routing definitions
-│   ├── utils/               # Clinical engines (Allergy Shield, Adherence, Substitutions)
-│   ├── public/              # Static assets (CSS stylesheets, client JS, SVG icons)
-│   └── views/               # Dynamic responsive view templates & partials
-└── uploads/                 # Local media storage (ignored in version control)
+│   ├── routes/              # Express REST API routes (/api/*)
+│   ├── utils/               # Clinical engines (Allergy Shield, Adherence, Substitution)
+│   └── views/               # EJS templates (Server-Side Rendered backup)
+├── app.js                   # Express application entry & CORS middleware
+└── package.json             # Root scripts and server dependencies
 ```
 
 ---
@@ -79,7 +71,7 @@ BB/
 * [Node.js](https://nodejs.org/) (v16 or higher)
 * [MongoDB](https://www.mongodb.com/) (Local instance or MongoDB Atlas URI)
 
-### Installation
+### Quick Start (Running Backend & React Client)
 
 1. **Clone the repository:**
    ```bash
@@ -87,31 +79,37 @@ BB/
    cd BB
    ```
 
-2. **Install dependencies:**
+2. **Install Root & Server Dependencies:**
    ```bash
    npm install
    ```
 
-3. **Configure Environment Variables:**
-   Create a `.env` file in the root directory (refer to `.env.example`):
+3. **Install Client Dependencies:**
+   ```bash
+   cd client
+   npm install
+   cd ..
+   ```
+
+4. **Configure Environment:**
+   Create `.env` in the root folder:
    ```env
    MONGO_URI=mongodb://localhost:27017/balancedb
    PORT=3000
    ```
 
-4. **Seed Sample Data (Optional):**
-   ```bash
-   npm run seed
-   ```
-
-5. **Start the Development Server:**
+5. **Start Express Backend Server (Port 3000):**
    ```bash
    npm run dev
    # or
    npm start
    ```
 
-6. Open your browser and navigate to `http://localhost:3000`.
+6. **Start React Frontend Client (Port 5173 with API Proxy):**
+   ```bash
+   npm run client
+   ```
+   Open `http://localhost:5173` in your browser.
 
 ---
 
