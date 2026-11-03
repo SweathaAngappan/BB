@@ -292,3 +292,4 @@ router.post('/appointments/book', async (req, res) => {
 });
 
 module.exports = router;
+
