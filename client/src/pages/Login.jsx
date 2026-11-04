@@ -14,7 +14,19 @@ export default function Login({ onLogin }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!email) return;
-    onLogin({ name: email.includes('sweatha') ? 'Sweatha' : (email.includes('admin') ? 'Admin' : 'Dr. Sarah'), email, role: 'user' });
+
+    let role = 'user';
+    let name = 'Sweatha';
+
+    if (email.toLowerCase().includes('sarah')) {
+      role = 'dietician';
+      name = 'Dr. Sarah';
+    } else if (email.toLowerCase().includes('admin')) {
+      role = 'admin';
+      name = 'System Administrator';
+    }
+
+    onLogin({ name, email, role });
     navigate('/dashboard');
   };
 
@@ -99,16 +111,15 @@ export default function Login({ onLogin }) {
 
       <div className="card-glass" style={{ padding: '32px', background: 'linear-gradient(135deg, rgba(16,185,129,0.06), rgba(5,150,105,0.02))' }}>
         <h3 style={{ fontSize: '20px', fontWeight: 800, margin: '0 0 12px' }}>
-          The Balanced Bowl Architecture
+          Role-Based Access Control (RBAC)
         </h3>
         <p style={{ fontSize: '14px', color: 'var(--neutral-700)', lineHeight: 1.6, margin: '0 0 16px' }}>
-          Fully developed MERN stack application featuring reactive component states, live dietary contraindication rules, and seamless dietician booking.
+          The Balanced Bowl provides customized dashboards depending on your clinical or client role:
         </p>
         <ul style={{ paddingLeft: '20px', margin: 0, fontSize: '13px', color: 'var(--neutral-700)', lineHeight: 1.8 }}>
-          <li>React 18 + Component Architecture</li>
-          <li>REST API Integration with Express.js</li>
-          <li>MongoDB Schemas for Health Logs & Diet Plans</li>
-          <li>100% Identical Original UI & Design Systems</li>
+          <li><strong>Patient (Sweatha):</strong> Meal logger, 7-day adherence index, grocery list.</li>
+          <li><strong>Dietician (Dr. Sarah):</strong> Clinical patient roster, plateau alerts, diet plan prescription.</li>
+          <li><strong>Administrator:</strong> Governance, verification, and platform analytics.</li>
         </ul>
       </div>
     </div>

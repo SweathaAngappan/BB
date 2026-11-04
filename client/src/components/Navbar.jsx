@@ -4,6 +4,10 @@ import { Link, useLocation } from 'react-router-dom';
 export default function Header({ currentUser, onLogout }) {
   const location = useLocation();
 
+  const displayName = currentUser
+    ? (currentUser.role === 'dietician' ? currentUser.name : currentUser.name.split(' ')[0])
+    : 'User';
+
   return (
     <header className="header" style={{ marginBottom: '24px' }}>
       <div className="brand">
@@ -34,26 +38,47 @@ export default function Header({ currentUser, onLogout }) {
       </div>
 
       <nav className="nav" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-        <Link to="/dieticians" id="nav-dieticians">Dieticians</Link>
-        <Link to="/dashboard" id="nav-dashboard">Dashboard</Link>
-        <Link to="/diet-plan" id="nav-dietplan">Diet Plan</Link>
-        <Link to="/grocery-list" id="nav-grocery">Grocery List</Link>
-        <Link to="/consultations" id="nav-appointments">Consultations</Link>
+        {currentUser?.role === 'dietician' ? (
+          <>
+            <Link to="/dashboard" id="nav-clients">🩺 Patient Roster</Link>
+            <Link to="/dieticians" id="nav-dieticians">Dieticians Directory</Link>
+            <Link to="/consultations" id="nav-appointments">Consultations</Link>
+          </>
+        ) : currentUser?.role === 'admin' ? (
+          <>
+            <Link to="/dashboard" id="nav-admin" style={{ fontWeight: 800 }}>⚡ Command Center</Link>
+            <Link to="/dieticians" id="nav-dieticians">Dieticians</Link>
+            <Link to="/consultations" id="nav-appointments">Consultations</Link>
+          </>
+        ) : (
+          <>
+            <Link to="/dieticians" id="nav-dieticians">Dieticians</Link>
+            {currentUser && (
+              <>
+                <Link to="/dashboard" id="nav-dashboard">Dashboard</Link>
+                <Link to="/diet-plan" id="nav-dietplan">Diet Plan</Link>
+                <Link to="/grocery-list" id="nav-grocery">Grocery List</Link>
+                <Link to="/consultations" id="nav-appointments">Consultations</Link>
+              </>
+            )}
+          </>
+        )}
 
         {currentUser ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '6px' }}>
             <span
               className="nav-pill"
               style={{
-                background: 'var(--neutral-100)',
-                color: 'var(--neutral-800)',
+                background: currentUser.role === 'dietician' ? '#ecfdf5' : 'var(--neutral-100)',
+                color: currentUser.role === 'dietician' ? '#065f46' : 'var(--neutral-800)',
+                border: currentUser.role === 'dietician' ? '1px solid #a7f3d0' : 'none',
                 fontWeight: 700,
                 borderRadius: '10px',
-                padding: '6px 10px',
+                padding: '6px 12px',
                 fontSize: '12px'
               }}
             >
-              {currentUser.name ? currentUser.name.split(' ')[0] : 'User'}
+              {displayName} ({currentUser.role === 'dietician' ? 'Dietician' : (currentUser.role === 'admin' ? 'Admin' : 'Patient')})
             </span>
             <button
               onClick={onLogout}

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-export default function Dashboard() {
+export default function Dashboard({ currentUser }) {
   const [aiMealText, setAiMealText] = useState('');
   const [aiMealType, setAiMealType] = useState('Lunch');
   const [swapModalMeal, setSwapModalMeal] = useState(null);
 
-  // Dynamic user macros and meals state
+  // Patient data state
   const [meals, setMeals] = useState([
     { id: 'm1', mealType: 'Breakfast', item: '2 Moong Dal Chilla with Mint Chutney', calories: 290, protein: 14, carbs: 36, status: 'eaten' },
     { id: 'm2', mealType: 'Lunch', item: 'Quinoa Bowl with Steamed Tofu & Spinach', calories: 480, protein: 26, carbs: 54, status: 'pending' },
@@ -20,6 +20,55 @@ export default function Dashboard() {
     carbs: 210,
     fats: 45
   });
+
+  // Clinician roster state for Dr. Sarah
+  const [clients, setClients] = useState([
+    {
+      id: 'c1',
+      name: 'Sweatha',
+      email: 'sweatha@balancedbowl.com',
+      phone: '+91 87783 53552',
+      adherence: 85,
+      weight: '67.5 kg (↓ 1.2 kg)',
+      statusLabel: 'Optimal Zone 💚',
+      statusClass: 'badge-success',
+      borderClass: '#10b981',
+      allergies: ['Lactose / Dairy'],
+      conditions: ['PCOS'],
+      planTitle: 'Metabolic Reset & Anti-Inflammatory Protocol',
+      calories: 1750
+    },
+    {
+      id: 'c2',
+      name: 'Rohan M.',
+      email: 'rohan.m@gmail.com',
+      phone: '+91 94432 10987',
+      adherence: 72,
+      weight: '76.0 kg (Static 14 days)',
+      statusLabel: 'Plateau Warning 💛',
+      statusClass: 'badge-warning',
+      borderClass: '#f59e0b',
+      allergies: ['Peanuts'],
+      conditions: ['Pre-Diabetic'],
+      planTitle: 'Insulin Sensitivity & Glycemic Control',
+      calories: 1850
+    },
+    {
+      id: 'c3',
+      name: 'Priya Sharma',
+      email: 'priya.sharma@outlook.com',
+      phone: '+91 98841 23456',
+      adherence: 94,
+      weight: '58.2 kg (↓ 2.5 kg)',
+      statusLabel: 'A+ Compliance 🌟',
+      statusClass: 'badge-success',
+      borderClass: '#10b981',
+      allergies: ['Gluten'],
+      conditions: ['Gut Health Renewal'],
+      planTitle: 'Gluten-Free Microbiome Rebuild',
+      calories: 1600
+    }
+  ]);
 
   const eatenMeals = meals.filter(m => m.status === 'eaten');
   const consumed = {
@@ -35,7 +84,6 @@ export default function Dashboard() {
     e.preventDefault();
     if (!aiMealText.trim()) return;
 
-    // Simulate AI parsing calories and macros from natural language
     const estimatedCals = Math.floor(Math.random() * 250) + 250;
     const estimatedProtein = Math.floor(Math.random() * 15) + 10;
     const estimatedCarbs = Math.floor(Math.random() * 25) + 30;
@@ -54,10 +102,6 @@ export default function Dashboard() {
     setAiMealText('');
   };
 
-  const setAiPrompt = (prompt) => {
-    setAiMealText(prompt);
-  };
-
   const recordCompliance = (id, newStatus) => {
     setMeals(meals.map(m => m.id === id ? { ...m, status: newStatus } : m));
   };
@@ -68,6 +112,200 @@ export default function Dashboard() {
     setSwapModalMeal(null);
   };
 
+  // =========================================================================
+  // VIEW 1: DIETICIAN VIEW (Dr. Sarah)
+  // =========================================================================
+  if (currentUser?.role === 'dietician') {
+    return (
+      <div>
+        {/* Clinician Header */}
+        <section className="section" style={{ marginBottom: '20px' }}>
+          <div className="page-heading" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <h1 style={{ fontSize: '28px', fontWeight: 800, color: 'var(--neutral-900)', margin: 0 }}>
+                  🩺 Clinical Patient Roster
+                </h1>
+                <span className="badge-pill badge-warning" style={{ fontSize: '12px' }}>
+                  ⚡ 1 Plateau Alert
+                </span>
+              </div>
+              <p className="meta" style={{ fontSize: '14px', color: 'var(--neutral-500)', margin: '4px 0 0' }}>
+                Welcome back, <strong>{currentUser.name}</strong> • Metabolic monitoring, adherence tracking, and client care
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <Link className="button" to="/consultations" style={{ textDecoration: 'none' }}>
+                📅 View Consultations Schedule
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Clinical KPI Cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '18px', marginBottom: '28px' }}>
+          <div className="card-glass" style={{ padding: '20px' }}>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--neutral-500)', textTransform: 'uppercase' }}>Active Patients</span>
+            <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--neutral-900)', marginTop: '4px' }}>3</div>
+            <span style={{ fontSize: '12px', color: 'var(--primary-emerald-dark)', fontWeight: 600 }}>100% on active protocols</span>
+          </div>
+
+          <div className="card-glass" style={{ padding: '20px' }}>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--neutral-500)', textTransform: 'uppercase' }}>Average Adherence</span>
+            <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--primary-emerald-dark)', marginTop: '4px' }}>83.6%</div>
+            <span style={{ fontSize: '12px', color: '#16a34a', fontWeight: 600 }}>Optimal Clinical Range</span>
+          </div>
+
+          <div className="card-glass" style={{ padding: '20px' }}>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--neutral-500)', textTransform: 'uppercase' }}>Metabolic Plateau Alerts</span>
+            <div style={{ fontSize: '28px', fontWeight: 800, color: '#f59e0b', marginTop: '4px' }}>1</div>
+            <span style={{ fontSize: '12px', color: '#b45309', fontWeight: 600 }}>Rohan M. requires macro re-calibration</span>
+          </div>
+
+          <div className="card-glass" style={{ padding: '20px' }}>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--neutral-500)', textTransform: 'uppercase' }}>Consultations Today</span>
+            <div style={{ fontSize: '28px', fontWeight: 800, color: '#0284c7', marginTop: '4px' }}>2</div>
+            <span style={{ fontSize: '12px', color: '#0369a1', fontWeight: 600 }}>Upcoming Video Appointments</span>
+          </div>
+        </div>
+
+        {/* Client Roster Cards */}
+        <h2 style={{ fontSize: '20px', fontWeight: 800, margin: '0 0 16px', color: 'var(--neutral-900)' }}>
+          Assigned Patients & Compliance Trajectory
+        </h2>
+
+        <div style={{ display: 'grid', gap: '18px' }}>
+          {clients.map((c) => (
+            <div
+              key={c.id}
+              className="card-glass"
+              style={{
+                borderLeft: `6px solid ${c.borderClass}`,
+                padding: '24px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '20px'
+              }}
+            >
+              <div style={{ flex: 1, minWidth: '280px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '8px' }}>
+                  <div
+                    style={{
+                      width: '46px',
+                      height: '46px',
+                      borderRadius: '14px',
+                      background: 'var(--accent-soft)',
+                      color: 'var(--accent-700)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontWeight: 800,
+                      fontSize: '18px'
+                    }}
+                  >
+                    {c.name.charAt(0)}
+                  </div>
+                  <div>
+                    <strong style={{ fontSize: '18px', color: 'var(--neutral-900)' }}>{c.name}</strong>
+                    <div style={{ fontSize: '13px', color: 'var(--neutral-500)' }}>{c.email} • {c.phone}</div>
+                  </div>
+                  <span className={`badge-pill ${c.statusClass}`} style={{ fontSize: '11px', marginLeft: 'auto' }}>
+                    {c.statusLabel}
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', margin: '10px 0' }}>
+                  <span className="macro-chip" style={{ fontSize: '12px' }}>⚖️ Weight: {c.weight}</span>
+                  <span className="macro-chip" style={{ fontSize: '12px' }}>🛡️ Allergies: {c.allergies.join(', ')}</span>
+                  <span className="macro-chip" style={{ fontSize: '12px' }}>🩺 Medical: {c.conditions.join(', ')}</span>
+                </div>
+
+                <div style={{ fontSize: '13px', color: 'var(--neutral-700)', marginTop: '8px' }}>
+                  <strong>Active Protocol:</strong> {c.planTitle} ({c.calories} kcal/day target)
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: '170px' }}>
+                <button
+                  className="btn-ai"
+                  onClick={() => alert(`Opening Diet Protocol Builder for ${c.name}...`)}
+                  style={{ border: 'none', cursor: 'pointer', padding: '10px 16px', fontSize: '13px', justifyContent: 'center' }}
+                >
+                  🥗 Prescribe / Edit Plan
+                </button>
+                <Link
+                  to="/consultations"
+                  className="btn btn-secondary"
+                  style={{ textAlign: 'center', padding: '8px 14px', fontSize: '13px', textDecoration: 'none' }}
+                >
+                  📅 Consultation Notes
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // =========================================================================
+  // VIEW 2: ADMIN VIEW
+  // =========================================================================
+  if (currentUser?.role === 'admin') {
+    return (
+      <div>
+        <section className="section" style={{ marginBottom: '24px' }}>
+          <div className="page-heading" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <h1 style={{ fontSize: '28px', fontWeight: 800, color: 'var(--neutral-900)', margin: 0 }}>
+                ⚡ Admin Command Center
+              </h1>
+              <span className="badge-pill" style={{ background: '#0f172a', color: '#fff', fontSize: '12px' }}>Root Governance</span>
+            </div>
+          </div>
+        </section>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '18px', marginBottom: '28px' }}>
+          <div className="card-glass" style={{ padding: '20px' }}>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--neutral-500)', textTransform: 'uppercase' }}>Total Users</span>
+            <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--neutral-900)' }}>124</div>
+            <span style={{ fontSize: '12px', color: 'var(--primary-emerald-dark)', fontWeight: 600 }}>Active Platform Accounts</span>
+          </div>
+          <div className="card-glass" style={{ padding: '20px' }}>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--neutral-500)', textTransform: 'uppercase' }}>Certified Clinicians</span>
+            <div style={{ fontSize: '28px', fontWeight: 800, color: '#0284c7' }}>18</div>
+            <span style={{ fontSize: '12px', color: '#0369a1', fontWeight: 600 }}>Verified Practitioners</span>
+          </div>
+          <div className="card-glass" style={{ padding: '20px' }}>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--neutral-500)', textTransform: 'uppercase' }}>Consultations Completed</span>
+            <div style={{ fontSize: '28px', fontWeight: 800, color: '#10b981' }}>86</div>
+            <span style={{ fontSize: '12px', color: 'var(--neutral-700)', fontWeight: 600 }}>Telehealth Sessions</span>
+          </div>
+          <div className="card-glass" style={{ padding: '20px' }}>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--neutral-500)', textTransform: 'uppercase' }}>Gross Platform Volume</span>
+            <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--primary-emerald-dark)' }}>₹51,600</div>
+            <span style={{ fontSize: '12px', color: 'var(--neutral-500)', fontWeight: 600 }}>Avg Adherence: 84%</span>
+          </div>
+        </div>
+
+        <div className="card-glass" style={{ padding: '24px' }}>
+          <h3 style={{ fontSize: '18px', fontWeight: 800, margin: '0 0 14px' }}>Verified Clinician Registrations</h3>
+          <div style={{ fontSize: '14px', color: 'var(--neutral-700)' }}>
+            All medical certifications have been vetted against clinical state boards.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // =========================================================================
+  // VIEW 3: PATIENT VIEW (Sweatha)
+  // =========================================================================
+  const patientName = currentUser?.name || 'Sweatha';
+
   return (
     <div>
       {/* Welcome & Quick Action Header */}
@@ -75,7 +313,7 @@ export default function Dashboard() {
         <div className="page-heading" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
           <div>
             <h1 style={{ fontSize: '30px', fontWeight: 800, color: 'var(--neutral-900)', margin: 0 }}>
-              Hi, Sweatha 👋
+              Hi, {patientName} 👋
             </h1>
             <p className="meta" style={{ fontSize: '15px', color: 'var(--neutral-500)', margin: '4px 0 0' }}>
               Tuesday's Health & Nutrition Dashboard
@@ -181,7 +419,7 @@ export default function Dashboard() {
               type="button"
               className="btn-sm-action"
               style={{ background: '#fff', border: '1px solid #d1d5db', fontSize: '12px', padding: '4px 10px', cursor: 'pointer' }}
-              onClick={() => setAiPrompt('2 rotis with 1 bowl dal tadka and cucumber salad')}
+              onClick={() => setAiMealText('2 rotis with 1 bowl dal tadka and cucumber salad')}
             >
               2 rotis + dal + salad
             </button>
@@ -189,7 +427,7 @@ export default function Dashboard() {
               type="button"
               className="btn-sm-action"
               style={{ background: '#fff', border: '1px solid #d1d5db', fontSize: '12px', padding: '4px 10px', cursor: 'pointer' }}
-              onClick={() => setAiPrompt('Greek yogurt bowl with 1 banana, chia seeds and almonds')}
+              onClick={() => setAiMealText('Greek yogurt bowl with 1 banana, chia seeds and almonds')}
             >
               Greek yogurt + almonds
             </button>
@@ -197,7 +435,7 @@ export default function Dashboard() {
               type="button"
               className="btn-sm-action"
               style={{ background: '#fff', border: '1px solid #d1d5db', fontSize: '12px', padding: '4px 10px', cursor: 'pointer' }}
-              onClick={() => setAiPrompt('Grilled chicken breast with 1 cup brown rice and broccoli')}
+              onClick={() => setAiMealText('Grilled chicken breast with 1 cup brown rice and broccoli')}
             >
               Grilled chicken + rice
             </button>
@@ -205,7 +443,7 @@ export default function Dashboard() {
               type="button"
               className="btn-sm-action"
               style={{ background: '#fff', border: '1px solid #d1d5db', fontSize: '12px', padding: '4px 10px', cursor: 'pointer' }}
-              onClick={() => setAiPrompt('Moong dal chilla with mint chutney and buttermilk')}
+              onClick={() => setAiMealText('Moong dal chilla with mint chutney and buttermilk')}
             >
               Moong dal chilla
             </button>
@@ -225,7 +463,6 @@ export default function Dashboard() {
             <span className="badge-pill badge-info">{consumed.calories} / {targets.calories} kcal</span>
           </div>
 
-          {/* Calories Bar */}
           <div style={{ marginBottom: '14px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', fontWeight: 700, marginBottom: '4px' }}>
               <span>Calories</span>
@@ -244,7 +481,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Protein Bar */}
           <div style={{ marginBottom: '14px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', fontWeight: 700, marginBottom: '4px' }}>
               <span style={{ color: '#166534' }}>Protein: {consumed.protein}g / {targets.protein}g</span>
@@ -263,8 +499,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Carbs Bar */}
-          <div style={{ marginBottom: '14px' }}>
+          <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', fontWeight: 700, marginBottom: '4px' }}>
               <span style={{ color: '#b45309' }}>Carbs: {consumed.carbs}g / {targets.carbs}g</span>
               <span>{Math.round((consumed.carbs / targets.carbs) * 100)}%</span>
@@ -283,7 +518,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Metabolic Status & Hydration */}
+        {/* Metabolic Vitality */}
         <div className="card-glass" style={{ padding: '24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
             <div>
@@ -318,7 +553,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Feature 3: Today's Scheduled Meals Checklist & 1-Click Swap */}
+      {/* Today's Meals Checklist */}
       <section className="section" style={{ marginBottom: '28px' }}>
         <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
           <div>
@@ -385,7 +620,6 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Action buttons */}
               <div className="meal-action-btns" style={{ display: 'flex', gap: '8px' }}>
                 <button
                   type="button"
