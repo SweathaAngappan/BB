@@ -227,7 +227,7 @@ exports.getPlanForUser = async (req, res) => {
       : [];
 
     res.render('diet-plan', {
-      client,
+      patient: client,
       plan,
       dietician,
       warnings,

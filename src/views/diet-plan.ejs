@@ -12,7 +12,7 @@
             <h1 style="font-size:30px; font-weight:800; color:var(--neutral-900); margin:0;">
               🩺 Clinical Diet Plan Builder
             </h1>
-            <span class="badge-pill badge-info">Patient: <%= client.name %></span>
+            <span class="badge-pill badge-info">Patient: <%= patient.name %></span>
           </div>
           <p class="meta" style="font-size:15px; color:var(--neutral-500); margin:6px 0 0;">
             Build and calibrate a custom 7-day nutritional prescription with automated contraindication detection.
@@ -27,19 +27,19 @@
       <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:16px;">
         <div>
           <div style="font-size:12px; font-weight:700; color:var(--neutral-500); text-transform:uppercase;">Age & Gender</div>
-          <strong style="color:var(--neutral-800);"><%= client.age || 'N/A' %> yrs • <%= client.gender || 'Not specified' %></strong>
+          <strong style="color:var(--neutral-800);"><%= patient.age || 'N/A' %> yrs • <%= patient.gender || 'Not specified' %></strong>
         </div>
         <div>
           <div style="font-size:12px; font-weight:700; color:var(--neutral-500); text-transform:uppercase;">Height & Weight</div>
-          <strong style="color:var(--neutral-800);"><%= client.height || '--' %> cm • <%= client.weight || '--' %> kg</strong>
+          <strong style="color:var(--neutral-800);"><%= patient.height || '--' %> cm • <%= patient.weight || '--' %> kg</strong>
         </div>
         <div>
           <div style="font-size:12px; font-weight:700; color:var(--neutral-500); text-transform:uppercase;">Target Weight</div>
-          <strong style="color:var(--primary-emerald-dark);"><%= client.targetWeight ? client.targetWeight + ' kg' : 'Maintenance' %></strong>
+          <strong style="color:var(--primary-emerald-dark);"><%= patient.targetWeight ? patient.targetWeight + ' kg' : 'Maintenance' %></strong>
         </div>
         <div>
           <div style="font-size:12px; font-weight:700; color:var(--neutral-500); text-transform:uppercase;">Dietary Preference</div>
-          <span class="badge-pill badge-purple"><%= client.dietaryPreference || 'all' %></span>
+          <span class="badge-pill badge-purple"><%= patient.dietaryPreference || 'all' %></span>
         </div>
       </div>
 
@@ -47,8 +47,8 @@
       <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--neutral-100); display:flex; gap:20px; flex-wrap:wrap;">
         <div>
           <span style="font-size:12px; font-weight:700; color:#b91c1c;">RECORDED ALLERGIES:</span>
-          <% if (client.allergies && client.allergies.length > 0) { %>
-            <% client.allergies.forEach(function(a) { %>
+          <% if (patient.allergies && patient.allergies.length > 0) { %>
+            <% patient.allergies.forEach(function(a) { %>
               <span class="badge-pill badge-danger" style="margin-left:4px; font-size:11px;"><%= a %></span>
             <% }); %>
           <% } else { %>
@@ -58,8 +58,8 @@
 
         <div>
           <span style="font-size:12px; font-weight:700; color:#b45309;">MEDICAL CONDITIONS:</span>
-          <% if (client.healthConditions && client.healthConditions.length > 0) { %>
-            <% client.healthConditions.forEach(function(c) { %>
+          <% if (patient.healthConditions && patient.healthConditions.length > 0) { %>
+            <% patient.healthConditions.forEach(function(c) { %>
               <span class="badge-pill badge-warning" style="margin-left:4px; font-size:11px;"><%= c %></span>
             <% }); %>
           <% } else { %>
@@ -95,7 +95,7 @@
 
     <!-- Diet Plan Form -->
     <div class="card-glass">
-      <form id="dietPlanForm" action="/dieticians/plan/<%= client._id %>" method="post">
+      <form id="dietPlanForm" action="/dieticians/plan/<%= patient._id %>" method="post">
         
         <!-- Target Settings -->
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:18px; margin-bottom:24px;">
